@@ -131,6 +131,14 @@
   .roster .ri .rc{font-size:9px; color:var(--teal); font-weight:700; margin-top:2px;}
   .win-card .btn{margin-top:6px;}
   html,body{overscroll-behavior:none;}
+  .size.locked,.tab.locked{opacity:.32;}
+  .tier-unlock{display:none; margin:0 0 12px; padding:10px; border:1px solid var(--teal); border-radius:10px; background:#e8f7f5; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink);}
+  .tier-unlock.show{display:block;}
+  .tier-unlock b{color:var(--teal);}
+  .cat-item.locked img{filter:brightness(0); opacity:.55;}
+  .cat-item.locked .nm{color:var(--dim);}
+  #board .cell img.full.pop{animation:settle .5s ease-out; transform-origin:center;}
+  @keyframes settle{from{transform:scale(1.05);}to{transform:scale(1);}}
   .view{display:none;}
   .view.on{display:block;}
   .navback{display:inline-block; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); margin-bottom:10px; cursor:pointer; padding:8px 4px;}
@@ -152,6 +160,7 @@
       <h1>Cross-World Archivist</h1>
       <div class="sub">Log every machine. Complete the scan.</div>
       <div class="btn" id="scanBtn">Begin scan</div>
+      <div class="btn ghost" id="sandboxBtn">Sandbox</div>
       <div class="btn ghost" id="collBtn">Collection</div>
       <div class="hstat" id="homeStat"></div>
     </div>
@@ -190,6 +199,7 @@
   <div class="win-card">
     <div class="k">Archivist log</div>
     <h2>Anomaly logged</h2>
+    <div class="tier-unlock" id="tierBanner"></div>
     <div class="wn" id="winName">Anomaly 001</div>
     <div class="roster" id="winRoster"></div>
     <div class="btn" id="nextBtn">Next anomaly &rarr;</div>
@@ -248,33 +258,39 @@ function assignmentFor(size,pi){
 }
 function getCollection(){ return lsGet('arch_collection',{}); }
 var curAssign=[];
-var state = { size:6, pi:0, cells:[], done:lsGet('arch_solved',{}) };
+var state = { size:6, pi:0, cells:[], done:lsGet('arch_solved',{}), mode:'ladder' };
 function P(){ return PUZZLES_BY_SIZE[state.size][state.pi]; }
 function typeForRegion(rid){ return curAssign[rid]; }
 function render(){
   var p=P(), n=p.n;
   curAssign=assignmentFor(state.size,state.pi);
+  var li0=ladderIndex(state.size,state.pi);
   document.getElementById('anomalyName').textContent =
-    'Anomaly '+String(state.pi+1).padStart(3,'0')+' — '+p.name;
+    (state.mode==='ladder'
+      ? 'Anomaly '+String(li0+1).padStart(3,'0')+' of '+LADDER.length+' — '
+      : 'Anomaly '+String(state.pi+1).padStart(3,'0')+' — ')+p.name;
   document.getElementById('boardMeta').innerHTML =
     '<span>Grid <b>'+n+'&times;'+n+'</b></span>'+
     '<span>Machines <b>'+n+'</b></span>'+
     '<span>Tier <b>'+tierLabel(n)+'</b></span>';
   var sz=document.getElementById('sizes'); sz.innerHTML='';
+  var gl0=getLadder();
   SIZES.forEach(function(gs){
     var b=document.createElement('div');
-    b.className='size'+(gs===state.size?' on':'');
+    var slocked=state.mode==='ladder'&&ladderIndex(gs,0)>gl0;
+    b.className='size'+(gs===state.size?' on':'')+(slocked?' locked':'');
     b.textContent=gs+'×'+gs;
-    b.onclick=function(){ loadSize(gs); };
+    b.onclick=function(){ if(slocked) return; loadSize(gs); };
     sz.appendChild(b);
   });
   var tabs=document.getElementById('tabs'); tabs.innerHTML='';
   var list=PUZZLES_BY_SIZE[state.size];
   list.forEach(function(q,i){
     var t=document.createElement('div');
-    t.className='tab'+(i===state.pi?' on':'')+(state.done[state.size+'-'+i]?' done':'');
+    var tlocked=state.mode==='ladder'&&ladderIndex(state.size,i)>gl0;
+    t.className='tab'+(i===state.pi?' on':'')+(state.done[state.size+'-'+i]?' done':'')+(tlocked?' locked':'');
     t.textContent=String(i+1).padStart(3,'0');
-    t.onclick=function(){ loadPuzzle(i); };
+    t.onclick=function(){ if(tlocked) return; loadPuzzle(i); };
     tabs.appendChild(t);
   });
   state.cells=[];
@@ -341,7 +357,11 @@ function clearCell(r,c){
   state.cells[r][c]=0; delete xTime[r+'_'+c]; paint(r,c);
 }
 function placeMachine(r,c){
-  state.cells[r][c]=2; delete xTime[r+'_'+c]; paint(r,c); checkWin();
+  state.cells[r][c]=2; delete xTime[r+'_'+c]; paint(r,c);
+  var d=document.getElementById('cell-'+r+'-'+c);
+  var fi=d&&d.querySelector('img.full');
+  if(fi) fi.classList.add('pop');
+  checkWin();
 }
 function dragPaint(cell){
   if(!pDown||!pDown.mode||!cell) return;
@@ -394,12 +414,26 @@ function checkWin(){
     for(var r2=0;r2<n;r2++){ var t=curAssign[r2]; coll[t.key]=(coll[t.key]||0)+1; }
     lsSet('arch_collection',coll);
   }
-  showWin();
+  var tierHit=0;
+  if(state.mode==='ladder'){
+    var li=ladderIndex(state.size,state.pi);
+    if(li===getLadder()){ setLadder(li+1); tierHit=ladderTierUnlock(li); }
+  }
+  showWin(tierHit);
 }
-function showWin(){
+function showWin(tierHit){
   var p=P(), n=p.n;
+  var li=ladderIndex(state.size,state.pi);
   document.getElementById('winName').textContent =
-    'Anomaly '+String(state.pi+1).padStart(3,'0')+' — '+p.name;
+    (state.mode==='ladder' ? 'Anomaly '+String(li+1).padStart(3,'0')+' of '+LADDER.length+' — ' : 'Anomaly '+String(state.pi+1).padStart(3,'0')+' — ')+p.name;
+  var tb=document.getElementById('tierBanner');
+  if(tierHit>0){
+    /* Hook for the tier-reveal cinematic: play it here when locked. */
+    tb.innerHTML='Tier <b>'+tierHit+'</b> &middot; '+tierNameFor(tierHit)+' &mdash; new machines detected';
+    tb.classList.add('show');
+  } else { tb.classList.remove('show'); tb.innerHTML=''; }
+  var lastLadder=state.mode==='ladder'&&li>=LADDER.length-1;
+  document.getElementById('nextBtn').style.display=lastLadder?'none':'';
   var ros=document.getElementById('winRoster'); ros.innerHTML='';
   var coll=getCollection();
   for(var r=0;r<n;r++){
@@ -415,6 +449,29 @@ function showWin(){
   document.getElementById('winOverlay').classList.add('show');
 }
 function hideWin(){ document.getElementById('winOverlay').classList.remove('show'); }
+/* Ladder progression: 23 anomalies in size order. Sandbox keeps the old
+   free-play behavior. Tier cinematics hook in at tierUnlockCard() later. */
+var LADDER=[];
+SIZES.forEach(function(gs){ var L=PUZZLES_BY_SIZE[gs]; for(var i=0;i<L.length;i++) LADDER.push({size:gs,pi:i}); });
+function ladderIndex(size,pi){ for(var i=0;i<LADDER.length;i++) if(LADDER[i].size===size&&LADDER[i].pi===pi) return i; return -1; }
+function getLadder(){
+  var v=lsGet('arch_ladder',null);
+  if(v===null){
+    v=0;
+    while(v<LADDER.length && state.done[LADDER[v].size+'-'+LADDER[v].pi]) v++;
+    v=Math.min(v,LADDER.length-1); lsSet('arch_ladder',v);
+  }
+  return v;
+}
+function setLadder(v){ v=Math.max(0,Math.min(LADDER.length-1,v)); lsSet('arch_ladder',v); return v; }
+function tierNameFor(t){ for(var i=0;i<TYPES.length;i++) if(TYPES[i].tier===t) return TYPES[i].tierName; return ''; }
+/* completed ladder idx -> newly introduced tier (0 if none) */
+function ladderTierUnlock(idx){
+  if(idx+1>=LADDER.length) return 0;
+  var prev=TIERS_BY_SIZE[LADDER[idx].size], next=TIERS_BY_SIZE[LADDER[idx+1].size], i;
+  for(i=0;i<next.length;i++) if(prev.indexOf(next[i])===-1) return next[i];
+  return 0;
+}
 function showView(v){
   ['home','game','collection'].forEach(function(k){
     document.getElementById('view-'+k).classList.toggle('on', k===v);
@@ -429,9 +486,10 @@ function collStats(){
   return {found:found, total:TYPES.length};
 }
 function renderHome(){
-  var st=collStats();
+  var st=collStats(), gl=getLadder();
+  document.getElementById('scanBtn').textContent = gl===0 ? 'Begin scan' : 'Continue scan';
   document.getElementById('homeStat').innerHTML =
-    '<b>'+st.found+'</b> of '+st.total+' machine types cataloged';
+    'Anomaly <b>'+(gl+1)+'</b> of '+LADDER.length+' &middot; <b>'+st.found+'</b> of '+st.total+' cataloged';
   for(var i=0;i<TYPES.length;i++) if(TYPES[i].key==='dragon'){
     document.getElementById('homeLogo').src=TYPES[i].icon;
   }
@@ -446,13 +504,13 @@ function renderCollection(){
   var coll=getCollection();
   TYPES.forEach(function(t){
     var d=document.createElement('div'); d.className='cat-item';
-    var im=document.createElement('img'); im.src=t.icon; im.alt=t.name;
-    var nm=document.createElement('div'); nm.className='nm'; nm.textContent=t.name;
-    var tr=document.createElement('div'); tr.className='tier'; tr.textContent='Tier '+t.tier+' \u00b7 '+t.tierName;
-    var cn=document.createElement('div'); cn.className='cnt';
     var n0=coll[t.key]||0;
-    cn.textContent='\u00d7 '+n0+(n0===1?' find':' finds');
-    if(n0>0) cn.classList.add('has');
+    var im=document.createElement('img'); im.src=t.icon; im.alt=n0>0?t.name:'Unknown machine';
+    var nm=document.createElement('div'); nm.className='nm'; nm.textContent=n0>0?t.name:'Unknown';
+    var tr=document.createElement('div'); tr.className='tier'; tr.textContent=n0>0?('Tier '+t.tier+' \u00b7 '+t.tierName):'???';
+    var cn=document.createElement('div'); cn.className='cnt';
+    if(n0>0){ cn.textContent='\u00d7 '+n0+(n0===1?' find':' finds'); cn.classList.add('has'); }
+    else { d.classList.add('locked'); cn.textContent='not yet found'; }
     d.appendChild(im); d.appendChild(nm); d.appendChild(tr); d.appendChild(cn);
     cat.appendChild(d);
   });
@@ -463,10 +521,20 @@ function loadPuzzle(i){
   render();
 }
 function loadSize(gs){
-  state.size=gs; state.pi=0; render();
+  state.size=gs; state.pi=0;
+  if(state.mode==='ladder'){
+    var gl=getLadder();
+    for(var i=0;i<PUZZLES_BY_SIZE[gs].length;i++) if(ladderIndex(gs,i)<=gl) state.pi=i;
+  }
+  render();
 }
 document.getElementById('resetBtn').onclick=function(){ render(); };
-document.getElementById('scanBtn').onclick=function(){ showView('game'); };
+document.getElementById('scanBtn').onclick=function(){
+  state.mode='ladder';
+  var gl=getLadder(); state.size=LADDER[gl].size; state.pi=LADDER[gl].pi; render();
+  showView('game');
+};
+document.getElementById('sandboxBtn').onclick=function(){ state.mode='sandbox'; render(); showView('game'); };
 document.getElementById('collBtn').onclick=function(){ showView('collection'); };
 document.getElementById('homeBtn1').onclick=function(){ showView('home'); };
 document.getElementById('homeBtn2').onclick=function(){ showView('home'); };
@@ -481,10 +549,15 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, {p
     lastTe=now;
   }, {passive:false});
 })();
-document.getElementById('nextBtn').onclick=function(){ loadPuzzle(state.pi+1); };
+document.getElementById('nextBtn').onclick=function(){
+  if(state.mode==='ladder'){
+    var li=ladderIndex(state.size,state.pi);
+    if(li+1<LADDER.length){ state.size=LADDER[li+1].size; state.pi=LADDER[li+1].pi; render(); }
+  } else loadPuzzle(state.pi+1);
+};
 document.getElementById('againBtn').onclick=function(){ hideWin(); render(); };
 window.__scan={
-  state:state, loadPuzzle:loadPuzzle, showView:showView, loadSize:loadSize,
+  state:state, loadPuzzle:loadPuzzle, showView:showView, LADDER:LADDER, getLadder:getLadder, loadSize:loadSize,
   poolForSize:poolForSize, tierLabel:tierLabel, SIZES:SIZES,
   typeForRegion:typeForRegion, getCollection:getCollection,
   assignment:assignmentFor,
@@ -495,6 +568,7 @@ window.__scan={
 render();
 renderHome();
 if(location.search.indexOf('demo=win')!==-1){
+  showView('game');
   var sol=P().solution;
   for(var r=0;r<sol.length;r++){ state.cells[r][sol[r]]=2; paint(r,sol[r]); }
   checkWin();
