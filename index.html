@@ -130,10 +130,34 @@
   .roster .ri .rn{font-size:8px; letter-spacing:.08em; color:var(--ink); text-transform:uppercase;}
   .roster .ri .rc{font-size:9px; color:var(--teal); font-weight:700; margin-top:2px;}
   .win-card .btn{margin-top:6px;}
+  html,body{overscroll-behavior:none;}
+  .view{display:none;}
+  .view.on{display:block;}
+  .navback{display:inline-block; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); margin-bottom:10px; cursor:pointer; padding:8px 4px;}
+  .navback:active{color:var(--teal);}
+  .home{min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px 8px;}
+  .home .logo{width:128px; height:128px; object-fit:contain; margin-bottom:14px;}
+  .home h1{font-size:30px;}
+  .home .btn{width:100%; max-width:300px; margin-top:12px;}
+  .home .hstat{margin-top:18px; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--dim);}
+  .home .hstat b{color:var(--teal);}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="view on" id="view-home">
+    <div class="home">
+      <div class="kicker"><span>Cross-World Archivist</span><span class="live">Signal lock</span></div>
+      <img class="logo" id="homeLogo" alt="Gear dragon">
+      <h1>Cross-World Archivist</h1>
+      <div class="sub">Log every machine. Complete the scan.</div>
+      <div class="btn" id="scanBtn">Begin scan</div>
+      <div class="btn ghost" id="collBtn">Collection</div>
+      <div class="hstat" id="homeStat"></div>
+    </div>
+  </div>
+  <div class="view" id="view-game">
+    <div class="navback" id="homeBtn1">&lsaquo; Home</div>
   <div class="kicker"><span>Cross-World Archivist</span><span class="live">Signal lock</span></div>
   <h1>Scan Field</h1>
   <div class="sub" id="anomalyName">Anomaly 001</div>
@@ -149,9 +173,16 @@
   <div class="actions">
     <div class="btn ghost" id="resetBtn">Reset field</div>
   </div>
-  <div class="catalog">
-    <div class="head" id="catHead"></div>
-    <div class="cat-row" id="catRow"></div>
+  </div>
+  <div class="view" id="view-collection">
+    <div class="navback" id="homeBtn2">&lsaquo; Home</div>
+    <div class="kicker"><span>Cross-World Archivist</span><span class="live">Signal lock</span></div>
+    <h1>Collection</h1>
+    <div class="sub" id="collStat"></div>
+    <div class="catalog">
+      <div class="head" id="collHead"></div>
+      <div class="cat-row" id="collRow"></div>
+    </div>
   </div>
   <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields</div>
 </div>
@@ -162,7 +193,7 @@
     <div class="wn" id="winName">Anomaly 001</div>
     <div class="roster" id="winRoster"></div>
     <div class="btn" id="nextBtn">Next anomaly &rarr;</div>
-    <div class="btn ghost" id="againBtn" style="margin-top:8px;">Keep scanning</div>
+    <div class="btn ghost" id="againBtn" style="margin-top:8px;">Scan Again</div>
   </div>
 </div>
 <script>
@@ -245,23 +276,6 @@ function render(){
     t.textContent=String(i+1).padStart(3,'0');
     t.onclick=function(){ loadPuzzle(i); };
     tabs.appendChild(t);
-  });
-  var pool=poolForSize(n);
-  document.getElementById('catHead').innerHTML =
-    'Cataloged &mdash; <b>'+tierLabel(n)+'</b> &middot; '+pool.length+' types';
-  var cat=document.getElementById('catRow'); cat.innerHTML='';
-  var coll=getCollection();
-  pool.forEach(function(t){
-    var d=document.createElement('div'); d.className='cat-item';
-    var im=document.createElement('img'); im.src=t.icon; im.alt=t.name;
-    var nm=document.createElement('div'); nm.className='nm'; nm.textContent=t.name;
-    var tr=document.createElement('div'); tr.className='tier'; tr.textContent=t.tierName;
-    var cn=document.createElement('div'); cn.className='cnt';
-    var n0=coll[t.key]||0;
-    cn.textContent='\u00d7 '+n0+(n0===1?' find':' finds');
-    if(n0>0) cn.classList.add('has');
-    d.appendChild(im); d.appendChild(nm); d.appendChild(tr); d.appendChild(cn);
-    cat.appendChild(d);
   });
   state.cells=[];
   for(var r=0;r<n;r++){ state.cells.push([]); for(var c=0;c<n;c++) state.cells[r].push(0); }
@@ -401,6 +415,48 @@ function showWin(){
   document.getElementById('winOverlay').classList.add('show');
 }
 function hideWin(){ document.getElementById('winOverlay').classList.remove('show'); }
+function showView(v){
+  ['home','game','collection'].forEach(function(k){
+    document.getElementById('view-'+k).classList.toggle('on', k===v);
+  });
+  window.scrollTo(0,0);
+  if(v==='home') renderHome();
+  if(v==='collection') renderCollection();
+}
+function collStats(){
+  var coll=getCollection(), found=0;
+  TYPES.forEach(function(t){ if((coll[t.key]||0)>0) found++; });
+  return {found:found, total:TYPES.length};
+}
+function renderHome(){
+  var st=collStats();
+  document.getElementById('homeStat').innerHTML =
+    '<b>'+st.found+'</b> of '+st.total+' machine types cataloged';
+  for(var i=0;i<TYPES.length;i++) if(TYPES[i].key==='dragon'){
+    document.getElementById('homeLogo').src=TYPES[i].icon;
+  }
+}
+function renderCollection(){
+  var st=collStats();
+  document.getElementById('collStat').textContent =
+    st.found+' of '+st.total+' machine types cataloged';
+  document.getElementById('collHead').innerHTML =
+    'All machines &mdash; <b>'+st.total+'</b> types';
+  var cat=document.getElementById('collRow'); cat.innerHTML='';
+  var coll=getCollection();
+  TYPES.forEach(function(t){
+    var d=document.createElement('div'); d.className='cat-item';
+    var im=document.createElement('img'); im.src=t.icon; im.alt=t.name;
+    var nm=document.createElement('div'); nm.className='nm'; nm.textContent=t.name;
+    var tr=document.createElement('div'); tr.className='tier'; tr.textContent='Tier '+t.tier+' \u00b7 '+t.tierName;
+    var cn=document.createElement('div'); cn.className='cnt';
+    var n0=coll[t.key]||0;
+    cn.textContent='\u00d7 '+n0+(n0===1?' find':' finds');
+    if(n0>0) cn.classList.add('has');
+    d.appendChild(im); d.appendChild(nm); d.appendChild(tr); d.appendChild(cn);
+    cat.appendChild(d);
+  });
+}
 function loadPuzzle(i){
   var list=PUZZLES_BY_SIZE[state.size];
   state.pi=((i%list.length)+list.length)%list.length;
@@ -410,10 +466,25 @@ function loadSize(gs){
   state.size=gs; state.pi=0; render();
 }
 document.getElementById('resetBtn').onclick=function(){ render(); };
+document.getElementById('scanBtn').onclick=function(){ showView('game'); };
+document.getElementById('collBtn').onclick=function(){ showView('collection'); };
+document.getElementById('homeBtn1').onclick=function(){ showView('home'); };
+document.getElementById('homeBtn2').onclick=function(){ showView('home'); };
+/* iOS ignores the no-zoom viewport tag: kill pinch-zoom outright, and stop the
+   OS double-tap zoom on the board (the game handles double-tap itself). */
+document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, {passive:false});
+(function(){
+  var lastTe=0, board=document.getElementById('board');
+  board.addEventListener('touchend', function(e){
+    var now=Date.now();
+    if(now-lastTe<350) e.preventDefault();
+    lastTe=now;
+  }, {passive:false});
+})();
 document.getElementById('nextBtn').onclick=function(){ loadPuzzle(state.pi+1); };
 document.getElementById('againBtn').onclick=function(){ hideWin(); render(); };
 window.__scan={
-  state:state, loadPuzzle:loadPuzzle, loadSize:loadSize,
+  state:state, loadPuzzle:loadPuzzle, showView:showView, loadSize:loadSize,
   poolForSize:poolForSize, tierLabel:tierLabel, SIZES:SIZES,
   typeForRegion:typeForRegion, getCollection:getCollection,
   assignment:assignmentFor,
@@ -422,6 +493,7 @@ window.__scan={
   solution:function(){ return P().solution.slice(); }
 };
 render();
+renderHome();
 if(location.search.indexOf('demo=win')!==-1){
   var sol=P().solution;
   for(var r=0;r<sol.length;r++){ state.cells[r][sol[r]]=2; paint(r,sol[r]); }
