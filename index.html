@@ -135,8 +135,8 @@
   #askBtn.used{opacity:.35;}
   .callmsg{text-align:center; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--teal); margin-top:8px; min-height:16px;}
   .board-shell.scanning .scan-sweep{height:16px; opacity:.9; animation-duration:1s;}
-  .cell.verified{box-shadow:inset 0 0 0 3px rgba(11,143,132,.9); animation:veripulse .7s ease-out 3;}
-  @keyframes veripulse{0%,100%{box-shadow:inset 0 0 0 3px rgba(11,143,132,.9);}50%{box-shadow:inset 0 0 0 6px rgba(11,143,132,.3);}}
+  .cell.flagged{box-shadow:inset 0 0 0 3px rgba(200,30,30,.95); animation:flagpulse .7s ease-out 3;}
+  @keyframes flagpulse{0%,100%{box-shadow:inset 0 0 0 3px rgba(200,30,30,.95);}50%{box-shadow:inset 0 0 0 6px rgba(200,30,30,.3);}}
   html,body{overscroll-behavior:none;}
   .size.locked,.tab.locked{opacity:.32;}
   .tier-unlock{display:none; margin:0 0 12px; padding:10px; border:1px solid var(--teal); border-radius:10px; background:#e8f7f5; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink);}
@@ -322,7 +322,7 @@ function render(){
 function paint(r,c){
   var p=P(), v=state.cells[r][c];
   var d=document.getElementById('cell-'+r+'-'+c);
-  d.classList.remove('x');
+  d.classList.remove('x'); d.classList.remove('flagged');
   var old=d.querySelector('img.full'); if(old) old.remove();
   if(v===1){ d.classList.add('x'); }
   else if(v===2){
@@ -523,14 +523,14 @@ document.getElementById('askBtn').onclick=function(){
   callMsg('The Archivist is scanning\u2026');
   setTimeout(function(){
     shell.classList.remove('scanning');
-    var good=placed.filter(function(rc){ return p.solution[rc[0]]===rc[1]; });
+    var bad=placed.filter(function(rc){ return p.solution[rc[0]]!==rc[1]; });
     var u=lsGet('arch_oracle',{}); u[key]=true; lsSet('arch_oracle',u);
-    if(good.length){
-      var pick=good[Math.floor(Math.random()*good.length)];
-      document.getElementById('cell-'+pick[0]+'-'+pick[1]).classList.add('verified');
-      callMsg('One scan confirmed.', 4000);
+    if(bad.length){
+      var pick=bad[Math.floor(Math.random()*bad.length)];
+      document.getElementById('cell-'+pick[0]+'-'+pick[1]).classList.add('flagged');
+      callMsg('One scan is off.', 4000);
     } else {
-      callMsg('None of these scan clean.', 4000);
+      callMsg('All scans check out.', 4000);
     }
   }, 2200);
 };
