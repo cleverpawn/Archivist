@@ -517,6 +517,7 @@ document.getElementById('askBtn').onclick=function(){
   var p=P(), n=p.n, placed=[];
   for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(state.cells[r][c]===2) placed.push([r,c]);
   if(!placed.length){ callMsg('Give me something to scan first.', 2500); return; }
+  if(placed.length>n){ callMsg('Too many scans placed.', 2500); return; }
   document.getElementById('askBtn').classList.add('used');
   var shell=document.querySelector('.board-shell');
   shell.classList.add('scanning');
@@ -525,13 +526,10 @@ document.getElementById('askBtn').onclick=function(){
     shell.classList.remove('scanning');
     var bad=placed.filter(function(rc){ return p.solution[rc[0]]!==rc[1]; });
     var u=lsGet('arch_oracle',{}); u[key]=true; lsSet('arch_oracle',u);
-    if(bad.length){
-      var pick=bad[Math.floor(Math.random()*bad.length)];
-      document.getElementById('cell-'+pick[0]+'-'+pick[1]).classList.add('flagged');
-      callMsg('One scan is off.', 4000);
-    } else {
-      callMsg('All scans check out.', 4000);
-    }
+    bad.forEach(function(rc){
+      document.getElementById('cell-'+rc[0]+'-'+rc[1]).classList.add('flagged');
+    });
+    callMsg(bad.length ? bad.length+' scan'+(bad.length>1?'s':'')+' off.' : 'All scans check out.', 4000);
   }, 2200);
 };
 document.getElementById('scanBtn').onclick=function(){ loadLevel(getLevel()); showView('game'); };
