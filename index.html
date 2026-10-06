@@ -582,7 +582,7 @@ document.getElementById('askBtn').onclick=function(){
       document.getElementById('cell-'+rc[0]+'-'+rc[1]).classList.add('flagged');
     });
     if(bad.length){ sfx.alert(); } else { sfx.clear(); }
-    callMsg(bad.length ? bad.length+' scan'+(bad.length>1?'s':'')+' off.' : 'All scans check out.', 4000);
+    callMsg(bad.length ? 'I found something. Take a look.' : 'All scans check out.', 4000);
   }, 2200);
 };
 document.getElementById('scanBtn').onclick=function(){ loadLevel(getLevel()); showView('game'); };
