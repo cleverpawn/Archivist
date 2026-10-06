@@ -214,7 +214,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 22</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 23</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -410,7 +410,7 @@ function onBoardUp(){
   if(d.moved) return;
   if(winSeq) return;
   var now=Date.now();
-  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<320&&lastTap.prev!==null){
+  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<1000&&lastTap.prev!==null){
     state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
     if(lastTap.prev===1) xTime[d.r+'_'+d.c]=now; else delete xTime[d.r+'_'+d.c];
     lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:null};
