@@ -214,7 +214,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 20</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 21</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -413,7 +413,7 @@ function onBoardUp(){
   if(d.moved) d.moved=false;
   var now=Date.now();
   var tdx=d.x-lastTap.x, tdy=d.y-lastTap.y;
-  var nearTap=lastTap.t>0&&tdx*tdx+tdy*tdy<576&&now-lastTap.t<1000&&lastTap.prev===0;
+  var nearTap=lastTap.t>0&&tdx*tdx+tdy*tdy<576&&now-lastTap.t<1000&&lastTap.prev>=0;
   if(nearTap){
     if(d.applied&&(d.r!==lastTap.r||d.c!==lastTap.c)){
       var k2=d.r+'_'+d.c;
