@@ -133,7 +133,15 @@
   .actions{display:flex; gap:8px;}
   .actions .btn{flex:1;}
   #askBtn.used{opacity:.35;}
-  .callmsg{text-align:center; font-size:15px; letter-spacing:.03em; color:var(--teal); font-weight:600; margin-top:8px; min-height:22px;}
+  .callmsg{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    z-index:5; pointer-events:none; max-width:88%;
+    text-align:center; font-size:30px; font-weight:700; letter-spacing:.02em;
+    color:#fff; background:rgba(8,22,28,.82);
+    border:1px solid rgba(11,143,132,.65); border-radius:14px;
+    padding:16px 22px; text-shadow:0 1px 4px rgba(0,0,0,.6);
+  }
+  .callmsg:empty{display:none;}
   .board-shell.scanning .scan-sweep::before{
     background:linear-gradient(180deg, transparent, rgba(11,143,132,.8), transparent);
     animation-duration:1.1s;
@@ -186,6 +194,7 @@
     <span class="c3"></span><span class="c4"></span>
     <div class="scan-sweep"></div>
     <div id="board"></div>
+    <div class="callmsg" id="callMsg"></div>
     <div class="board-meta" id="boardMeta"></div>
   </div>
   <div class="hint">Tap: mark &#10005; &middot; Double-tap: place machine &middot; Drag: paint &#10005;</div>
@@ -193,7 +202,6 @@
     <div class="btn" id="askBtn">Call the Archivist</div>
     <div class="btn ghost" id="resetBtn">Reset field</div>
   </div>
-  <div class="callmsg" id="callMsg"></div>
   </div>
   <div class="view" id="view-collection">
     <div class="navback" id="homeBtn2">&lsaquo; Home</div>
@@ -306,7 +314,7 @@ function render(){
       var d=document.createElement('div');
       d.className='cell'; d.id='cell-'+r+'-'+c;
       d.style.background=rgba(col,0.22);
-      d.style.setProperty('--xc', rgba(col,1));
+      d.style.setProperty('--xc', rgba([col[0]*0.5|0,col[1]*0.5|0,col[2]*0.5|0],1));
       var e='rgb('+col[0]+','+col[1]+','+col[2]+')', inner='1px solid #d9e1ea';
       d.style.borderTop    = at(r-1,c)!==rid ? '2px solid '+e : inner;
       d.style.borderBottom = at(r+1,c)!==rid ? '2px solid '+e : inner;
