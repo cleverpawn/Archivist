@@ -213,7 +213,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 14</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 16</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -410,7 +410,7 @@ function onBoardUp(){
   var d=pDown; pDown=null;
   if(d.moved) return;
   var now=Date.now();
-  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<500&&lastTap.prev>=0){
+  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<1000&&lastTap.prev>=0){
     state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
     lastTap={r:-1,c:-1,t:0,prev:-1};
     placeMachine(d.r,d.c); sfx.place();
