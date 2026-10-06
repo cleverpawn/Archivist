@@ -378,7 +378,9 @@ function dragPaint(cell){
   if(pDown.mode==='add'&&v===0){ setX(cell.r,cell.c); pDown.changed=true; }
   else if(pDown.mode==='remove'&&v===1){ clearCell(cell.r,cell.c); pDown.changed=true; }
 }
+var winSeq=false;
 function onBoardDown(e){
+  if(winSeq) return;
   var cell=cellFromPoint(e.clientX,e.clientY);
   if(!cell) return;
   var v=state.cells[cell.r][cell.c], key=cell.r+'_'+cell.c, mode=null;
@@ -427,7 +429,16 @@ function checkWin(){
   if(state.mode==='ladder' && state.level===getLevel()){
     setLevel(state.level+1); tierHit=levelTierUnlock(state.level);
   }
-  showWin(tierHit);
+  winSeq=true;
+  var shell=document.querySelector('.board-shell');
+  shell.classList.add('scanning');
+  sfx.win();
+  callMsg('You\u2019ve done it!', 2600);
+  setTimeout(function(){
+    shell.classList.remove('scanning');
+    winSeq=false;
+    showWin(tierHit);
+  }, 2600);
 }
 function showWin(tierHit){
   var p=P(), n=p.n;
@@ -562,7 +573,8 @@ var sfx=(function(){
   return {
     scan:function(){ ensure(); tone(740,0,0.07,'square',0.07); tone(1108,0.1,0.07,'square',0.07); sweep(280,1350,0.2,1.9,0.05); },
     alert:function(){ tone(520,0,0.1,'square',0.08); tone(392,0.12,0.16,'square',0.08); },
-    clear:function(){ tone(880,0,0.1,'sine',0.09); tone(1318,0.11,0.18,'sine',0.09); }
+    clear:function(){ tone(880,0,0.1,'sine',0.09); tone(1318,0.11,0.18,'sine',0.09); },
+    win:function(){ ensure(); sweep(300,1600,0,2.0,0.06); tone(880,1.9,0.12,'sine',0.09); tone(1174,2.02,0.22,'sine',0.09); }
   };
 })();
 document.getElementById('askBtn').onclick=function(){
