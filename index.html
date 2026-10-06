@@ -354,11 +354,19 @@ function setX(r,c){
 function clearCell(r,c){
   state.cells[r][c]=0; delete xTime[r+'_'+c]; paint(r,c);
 }
+var lastOfferKey=null;
 function placeMachine(r,c){
   state.cells[r][c]=2; delete xTime[r+'_'+c]; paint(r,c);
   var d=document.getElementById('cell-'+r+'-'+c);
   var fi=d&&d.querySelector('img.full');
   if(fi) fi.classList.add('pop');
+  var n=P().n, placed=0;
+  for(var rr=0;rr<n;rr++) for(var cc=0;cc<n;cc++) if(state.cells[rr][cc]===2) placed++;
+  var key=oracleKey();
+  if(placed===1 && key!==lastOfferKey && !lsGet('arch_oracle',{})[key]){
+    lastOfferKey=key;
+    callMsg('I only have a moment, would you like me to check your scans?', 4500);
+  }
   checkWin();
 }
 function dragPaint(cell){
@@ -559,7 +567,7 @@ document.getElementById('askBtn').onclick=function(){
   if(used[key]){ callMsg('The Archivist has already spoken.', 2500); return; }
   var p=P(), n=p.n, placed=[];
   for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(state.cells[r][c]===2) placed.push([r,c]);
-  if(!placed.length){ callMsg('Give me something to scan first.', 2500); return; }
+  if(!placed.length){ callMsg('Give me something to scan and I\u2019ll try to help you.', 3000); return; }
   if(placed.length>n){ callMsg('Too many scans placed.', 2500); return; }
   document.getElementById('askBtn').classList.add('used');
   var shell=document.querySelector('.board-shell');
