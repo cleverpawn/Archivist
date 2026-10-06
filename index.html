@@ -402,7 +402,7 @@ function onBoardUp(){
   var d=pDown; pDown=null;
   if(d.moved) return;
   var now=Date.now();
-  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<320&&lastTap.prev>=0){
+  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<500&&lastTap.prev>=0){
     state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
     lastTap={r:-1,c:-1,t:0,prev:-1};
     placeMachine(d.r,d.c);
@@ -433,7 +433,7 @@ function checkWin(){
   var shell=document.querySelector('.board-shell');
   shell.classList.add('scanning');
   sfx.win();
-  callMsg('You\u2019ve done it!', 2600);
+  callMsg('You\u2019ve done it, great work!', 2600);
   setTimeout(function(){
     shell.classList.remove('scanning');
     winSeq=false;
