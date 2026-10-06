@@ -214,7 +214,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 21</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 22</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -350,7 +350,7 @@ function paint(r,c){
    starting on a freshly-painted X (<3s) keeps painting, which also absorbs
    the iOS touch-stutter where one gesture arrives as tap-then-drag. */
 var xTime={}, FRESH_X_MS=3000;
-var lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:-1}, pDown=null;
+var lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:null}, pDown=null;
 function cellFromPoint(x,y){
   var el=document.elementFromPoint(x,y);
   if(!el||!el.closest) return null;
@@ -395,40 +395,29 @@ function onBoardDown(e){
   var v=state.cells[cell.r][cell.c], key=cell.r+'_'+cell.c, mode=null;
   if(v===0) mode='add';
   else if(v===1) mode=(Date.now()-(xTime[key]||0)<FRESH_X_MS)?'add':'remove';
-  pDown={r:cell.r,c:cell.c,x:e.clientX,y:e.clientY,moved:false,changed:false,mode:mode,prevV:v,applied:false};
-  if(mode==='add'&&v===0){ setX(cell.r,cell.c); sfx.tick(); pDown.applied=true; }
-  else if(mode==='remove'&&v===1){ clearCell(cell.r,cell.c); sfx.untick(); pDown.applied=true; }
+  pDown={r:cell.r,c:cell.c,x:e.clientX,y:e.clientY,moved:false,changed:false,mode:mode};
   try{document.getElementById('board').setPointerCapture(e.pointerId);}catch(err){}
 }
 function onBoardMove(e){
   if(!pDown) return;
   var dx=e.clientX-pDown.x, dy=e.clientY-pDown.y;
   if(!pDown.moved&&dx*dx+dy*dy>100) pDown.moved=true;
-  if(pDown.moved) dragPaint(cellFromPoint(e.clientX,e.clientY));
+  if(pDown.moved){ dragPaint({r:pDown.r,c:pDown.c}); dragPaint(cellFromPoint(e.clientX,e.clientY)); }
 }
 function onBoardUp(){
   if(!pDown) return;
   var d=pDown; pDown=null;
-  if(d.moved&&d.changed) return;
-  if(d.moved) d.moved=false;
+  if(d.moved) return;
+  if(winSeq) return;
   var now=Date.now();
-  var tdx=d.x-lastTap.x, tdy=d.y-lastTap.y;
-  var nearTap=lastTap.t>0&&tdx*tdx+tdy*tdy<576&&now-lastTap.t<1000&&lastTap.prev>=0;
-  if(nearTap){
-    if(d.applied&&(d.r!==lastTap.r||d.c!==lastTap.c)){
-      var k2=d.r+'_'+d.c;
-      state.cells[d.r][d.c]=d.prevV;
-      if(d.prevV===1) xTime[k2]=now; else delete xTime[k2];
-      paint(d.r,d.c);
-    }
-    var tr=lastTap.r, tc=lastTap.c;
-    state.cells[tr][tc]=lastTap.prev; paint(tr,tc);
-    lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:-1};
-    placeMachine(tr,tc); sfx.place();
-  }else if(d.applied){
-    lastTap={r:d.r,c:d.c,x:d.x,y:d.y,t:now,prev:d.prevV};
+  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<320&&lastTap.prev!==null){
+    state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
+    if(lastTap.prev===1) xTime[d.r+'_'+d.c]=now; else delete xTime[d.r+'_'+d.c];
+    lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:null};
+    placeMachine(d.r,d.c); sfx.place();
   }else{
     var v=state.cells[d.r][d.c];
+    if(v===2){ lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:null}; clearCell(d.r,d.c); sfx.untick(); return; }
     lastTap={r:d.r,c:d.c,x:d.x,y:d.y,t:now,prev:v};
     if(v===0){ setX(d.r,d.c); sfx.tick(); } else { clearCell(d.r,d.c); sfx.untick(); }
   }
