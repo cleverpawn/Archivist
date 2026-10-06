@@ -213,7 +213,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 16</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 17</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -395,8 +395,8 @@ function onBoardDown(e){
   if(v===0) mode='add';
   else if(v===1) mode=(Date.now()-(xTime[key]||0)<FRESH_X_MS)?'add':'remove';
   pDown={r:cell.r,c:cell.c,x:e.clientX,y:e.clientY,moved:false,changed:false,mode:mode,prevV:v,applied:false};
-  if(mode==='add'&&v===0){ setX(cell.r,cell.c); sfx.tick(); pDown.applied=true; pDown.changed=true; }
-  else if(mode==='remove'&&v===1){ clearCell(cell.r,cell.c); sfx.untick(); pDown.applied=true; pDown.changed=true; }
+  if(mode==='add'&&v===0){ setX(cell.r,cell.c); sfx.tick(); pDown.applied=true; }
+  else if(mode==='remove'&&v===1){ clearCell(cell.r,cell.c); sfx.untick(); pDown.applied=true; }
   try{document.getElementById('board').setPointerCapture(e.pointerId);}catch(err){}
 }
 function onBoardMove(e){
@@ -408,7 +408,8 @@ function onBoardMove(e){
 function onBoardUp(){
   if(!pDown) return;
   var d=pDown; pDown=null;
-  if(d.moved) return;
+  if(d.moved&&d.changed) return;
+  if(d.moved) d.moved=false;
   var now=Date.now();
   if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<1000&&lastTap.prev>=0){
     state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
