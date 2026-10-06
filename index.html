@@ -273,7 +273,7 @@ function render(){
   document.getElementById('boardMeta').innerHTML =
     '<span>Grid <b>'+n+'&times;'+n+'</b></span>'+
     '<span>Machines <b>'+n+'</b></span>'+
-    (state.mode==='ladder' ? '<span>Tier <b>'+tierLabelFor(state.level)+'</b></span>' : '');
+    (state.mode==='ladder' ? '<span><b>'+tierLabelFor(state.level)+'</b></span>' : '');
   var sz=document.getElementById('sizes'); sz.innerHTML='';
   var tabs=document.getElementById('tabs'); tabs.innerHTML='';
   if(state.mode==='sandbox'){
