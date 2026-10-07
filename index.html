@@ -214,7 +214,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 24</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 25</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -620,14 +620,7 @@ document.getElementById('homeBtn2').onclick=function(){ showView('home'); };
 /* iOS ignores the no-zoom viewport tag: kill pinch-zoom outright, and stop the
    OS double-tap zoom on the board (the game handles double-tap itself). */
 document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, {passive:false});
-(function(){
-  var lastTe=0, board=document.getElementById('board');
-  board.addEventListener('touchend', function(e){
-    var now=Date.now();
-    if(now-lastTe<350) e.preventDefault();
-    lastTe=now;
-  }, {passive:false});
-})();
+
 document.getElementById('nextBtn').onclick=function(){
   if(state.mode==='ladder'){ loadLevel(state.level+1); }
   else loadSandbox(state.size,(state.bi+1)%BOARDS[state.size].length);
