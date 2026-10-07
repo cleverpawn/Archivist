@@ -218,7 +218,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 26</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 27</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -342,9 +342,9 @@ function paint(r,c){
   var old=d.querySelector('img.full'); if(old) old.remove();
   if(v===1){ d.classList.add('x'); }
   else if(v===2){
-    var t=typeForRegion(p.regions[r][c], p.n);
+    var t=typeForRegion(p.regions[r][c], p.n)||typeForRegion(0)||{icon:'',name:'machine'};
     var fi=document.createElement('img');
-    fi.className='full'; fi.src=t.icon; fi.alt=t.name;
+    fi.className='full'; if(t.icon) fi.src=t.icon; fi.alt=t.name||'machine';
     d.appendChild(fi);
   }
 }
@@ -430,7 +430,9 @@ function onBoardUp(){
 }
 function onBoardCancel(){ pDown=null; }
 function checkWin(){
-  var p=P(), n=p.n;
+  var p=P(), n=p.n, placed=0;
+  for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(state.cells[r][c]===2) placed++;
+  if(placed!==n) return;
   for(var r=0;r<n;r++) if(state.cells[r][p.solution[r]]!==2) return;
   var dkey=oracleKey();
   if(!state.done[dkey]){
@@ -630,6 +632,15 @@ document.getElementById('homeBtn2').onclick=function(){ showView('home'); };
 /* iOS ignores the no-zoom viewport tag: kill pinch-zoom outright, and stop the
    OS double-tap zoom on the board (the game handles double-tap itself). */
 document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, {passive:false});
+document.addEventListener('dblclick', function(e){ e.preventDefault(); }, {passive:false});
+(function(){
+  var lastTe=0;
+  document.getElementById('board').addEventListener('touchend', function(e){
+    var now=Date.now();
+    if(now-lastTe<400) e.preventDefault();
+    lastTe=now;
+  }, {passive:false});
+})();
 
 document.getElementById('nextBtn').onclick=function(){
   if(state.mode==='ladder'){ loadLevel(state.level+1); }
