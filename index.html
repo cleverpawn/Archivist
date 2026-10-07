@@ -196,6 +196,7 @@
       <div class="btn" id="scanBtn">Begin scan</div>
       <div class="btn ghost" id="sandboxBtn">Sandbox</div>
       <div class="btn ghost" id="collBtn">Collection</div>
+      <div class="btn ghost" id="tutBtn">Tutorial</div>
       <div class="hstat" id="homeStat"></div>
     </div>
   </div>
@@ -234,7 +235,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 31</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 32</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -712,6 +713,12 @@ document.getElementById('askBtn').onclick=function(){
 document.getElementById('scanBtn').onclick=function(){ loadLevel(getLevel()); showView('game'); };
 document.getElementById('sandboxBtn').onclick=function(){ loadSandbox(6,0); showView('game'); };
 document.getElementById('collBtn').onclick=function(){ showView('collection'); };
+document.getElementById('tutBtn').onclick=function(){
+  lsSet('arch_tutorial_done', false);
+  // Reset to level 1 for tutorial
+  lsSet('arch_level', 1);
+  loadLevel(1); showView('game');
+};
 document.getElementById('homeBtn1').onclick=function(){ showView('home'); };
 document.getElementById('homeBtn2').onclick=function(){ showView('home'); };
 /* iOS ignores the no-zoom viewport tag: kill pinch-zoom outright, and stop the
