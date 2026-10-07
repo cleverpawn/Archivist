@@ -235,7 +235,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 35</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 36</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -622,7 +622,8 @@ var sfx=(function(){
 var tutStep=0, tutAudio=null;
 function tutPlay(n){
   if(tutAudio) tutAudio.pause();
-  tutAudio=new Audio('tutorial-line'+n+'.m4a');
+  tutAudio=tutPreloaded[n]||new Audio('tutorial-line'+n+'.m4a');
+  tutAudio.currentTime=0;
   tutAudio.play().catch(function(){});
 }
 function tutShow(html, showNext){
@@ -633,8 +634,15 @@ function tutShow(html, showNext){
 function tutHide(){ document.getElementById('tutOverlay').classList.remove('show'); clearTutHL(); }
 function clearTutHL(){ var h=document.querySelectorAll('.tutHL'); for(var i=0;i<h.length;i++) h[i].classList.remove('tutHL'); }
 function tutHighlight(r,c){ clearTutHL(); var d=document.getElementById('cell-'+r+'-'+c); if(d) d.classList.add('tutHL'); }
+var tutPreloaded={};
+function tutPreload(){
+  for(var i=1;i<=4;i++){
+    if(!tutPreloaded[i]){ var a=new Audio('tutorial-line'+i+'.m4a'); a.preload='auto'; a.load(); tutPreloaded[i]=a; }
+  }
+}
 function startTutorial(){
   if(lsGet('arch_tutorial_done',false)) return;
+  tutPreload();
   tutStep=1;
   tutShow('Here we are. Welcome to the Scanfields. Tap any cell to mark it empty. That means no machine hides there.', false);
   tutPlay(1); tutHighlight(1,1);
