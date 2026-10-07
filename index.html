@@ -140,10 +140,10 @@
   }
   .callmsg:empty{display:none;}
   #tutOverlay{position:fixed; inset:0; z-index:200; display:none; align-items:flex-end; justify-content:center;
-    background:rgba(10,20,25,.45); padding:18px;}
+    background:rgba(10,20,25,.45); padding:18px; pointer-events:none;}
   #tutOverlay.show{display:flex;}
   #tutCard{background:#f4f1e8; border-radius:16px; max-width:520px; width:100%; padding:16px;
-    display:flex; gap:12px; align-items:center; box-shadow:0 8px 32px rgba(0,0,0,.3);}
+    display:flex; gap:12px; align-items:center; box-shadow:0 8px 32px rgba(0,0,0,.3); pointer-events:auto;}
   #tutCard img{width:84px; height:84px; border-radius:50%; object-fit:cover; flex-shrink:0; border:3px solid #2a7f6f;}
   #tutText{flex:1; font-size:15px; line-height:1.45; color:#1e3a3a;}
   #tutText b{color:#0f2a2a;}
@@ -234,7 +234,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 30</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 31</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
