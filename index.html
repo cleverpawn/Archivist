@@ -215,7 +215,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 28</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 29</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -302,7 +302,7 @@ function render(){
     nb.onclick=function(){ loadSandbox(state.size,(state.bi+1)%BOARDS[state.size].length); };
     tabs.appendChild(nb);
   }
-  document.getElementById('askBtn').classList.toggle('used', !!lsGet('arch_oracle',{})[oracleKey()]);
+  updateAskBtn();
   document.getElementById('callMsg').textContent='';
   state.cells=[];
   for(var r=0;r<n;r++){ state.cells.push([]); for(var c=0;c<n;c++) state.cells[r].push(0); }
@@ -591,14 +591,31 @@ var sfx=(function(){
     place:function(){ tone(1250,0,0.03,'triangle',0.04); tone(820,0.045,0.05,'triangle',0.04); }
   };
 })();
+var SCAN_COOLDOWN=3*60*1000, askTimer=null;
+function scanReadyAt(){ var t=lsGet('arch_oracle',{})[oracleKey()]; return t||0; }
+function scanCooldownLeft(){ return Math.max(0, scanReadyAt()+SCAN_COOLDOWN-Date.now()); }
+function updateAskBtn(){
+  var btn=document.getElementById('askBtn'), left=scanCooldownLeft();
+  if(askTimer){ clearInterval(askTimer); askTimer=null; }
+  if(left>0){
+    btn.classList.add('used');
+    var tick=function(){
+      var l=scanCooldownLeft();
+      if(l<=0){ btn.classList.remove('used'); btn.textContent='Call the Archivist'; if(askTimer){clearInterval(askTimer);askTimer=null;} return; }
+      var s=Math.ceil(l/1000); btn.textContent='Recharging '+Math.floor(s/60)+':'+('0'+(s%60)).slice(-2);
+    };
+    tick(); askTimer=setInterval(tick,1000);
+  } else {
+    btn.classList.remove('used'); btn.textContent='Call the Archivist';
+  }
+}
 document.getElementById('askBtn').onclick=function(){
-  var key=oracleKey(), used=lsGet('arch_oracle',{});
-  if(used[key]){ callMsg('The Archivist has already spoken.', 2500); return; }
+  var key=oracleKey(), left=scanCooldownLeft();
+  if(left>0){ var s=Math.ceil(left/1000); callMsg('The Archivist is recharging ('+Math.floor(s/60)+':'+('0'+(s%60)).slice(-2)+').', 2500); return; }
   var p=P(), n=p.n, placed=[];
   for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(state.cells[r][c]===2) placed.push([r,c]);
   if(!placed.length){ callMsg('Give me something to scan and I\u2019ll try to help you.', 3000); return; }
   if(placed.length>n){ callMsg('Too many scans placed.', 2500); return; }
-  document.getElementById('askBtn').classList.add('used');
   var shell=document.querySelector('.board-shell');
   callMsg('The Archivist is scanning\u2026');
   setTimeout(function(){
@@ -607,7 +624,7 @@ document.getElementById('askBtn').onclick=function(){
     setTimeout(function(){
       shell.classList.remove('scanning');
       var bad=placed.filter(function(rc){ return p.solution[rc[0]]!==rc[1]; });
-      var u=lsGet('arch_oracle',{}); u[key]=true; lsSet('arch_oracle',u);
+      var u=lsGet('arch_oracle',{}); u[key]=Date.now(); lsSet('arch_oracle',u); updateAskBtn();
       bad.forEach(function(rc){
         document.getElementById('cell-'+rc[0]+'-'+rc[1]).classList.add('flagged');
       });
