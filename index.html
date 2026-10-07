@@ -139,6 +139,20 @@
     display:flex; flex-direction:column; align-items:flex-start; gap:4px;
   }
   .callmsg:empty{display:none;}
+  #tutOverlay{position:fixed; inset:0; z-index:200; display:none; align-items:flex-end; justify-content:center;
+    background:rgba(10,20,25,.45); padding:18px;}
+  #tutOverlay.show{display:flex;}
+  #tutCard{background:#f4f1e8; border-radius:16px; max-width:520px; width:100%; padding:16px;
+    display:flex; gap:12px; align-items:center; box-shadow:0 8px 32px rgba(0,0,0,.3);}
+  #tutCard img{width:84px; height:84px; border-radius:50%; object-fit:cover; flex-shrink:0; border:3px solid #2a7f6f;}
+  #tutText{flex:1; font-size:15px; line-height:1.45; color:#1e3a3a;}
+  #tutText b{color:#0f2a2a;}
+  #tutBtns{display:flex; gap:8px; margin-top:10px;}
+  #tutNext{background:#2a7f6f; color:#fff; border:none; border-radius:10px; padding:10px 18px;
+    font-size:15px; font-weight:600; cursor:pointer;}
+  #tutSkip{background:none; border:none; color:#5a7a7a; font-size:14px; cursor:pointer; text-decoration:underline;}
+  .tutHL{outline:3px solid #ffb300 !important; outline-offset:-3px; animation:tutPulse 1s infinite;}
+  @keyframes tutPulse{0%,100%{outline-color:#ffb300;}50%{outline-color:#ff6b00;}}
 
   .imsg-who{font-size:12px; font-weight:600; color:#8e8e93; padding-left:12px; letter-spacing:.02em;}
   .imsg-bub{font-size:16px; font-weight:400; color:#111; background:#e9e9eb;
@@ -196,7 +210,12 @@
     <span class="c3"></span><span class="c4"></span>
     <div class="scan-sweep"></div>
     <div id="board"></div>
-    <div class="callmsg" id="callMsg"></div>
+    <div id="tutOverlay"><div id="tutCard">
+    <img src="archivist-tutorial.webp" alt="The Archivist">
+    <div style="flex:1"><div id="tutText"></div>
+    <div id="tutBtns"><button id="tutNext" style="display:none">Got it</button><button id="tutSkip">Skip tutorial</button></div>
+    </div></div></div>
+  <div class="callmsg" id="callMsg"></div>
     <div class="board-meta" id="boardMeta"></div>
   </div>
   <div class="hint">Tap: mark &#10005; &middot; Double-tap: place machine &middot; Drag: paint &#10005;</div>
@@ -215,7 +234,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 29</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 30</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -305,6 +324,7 @@ function render(){
   updateAskBtn();
   document.getElementById('callMsg').textContent='';
   state.cells=[];
+  if(state.level===1 && state.mode==='ladder' && !lsGet('arch_tutorial_done',false)) setTimeout(startTutorial, 800);
   for(var r=0;r<n;r++){ state.cells.push([]); for(var c=0;c<n;c++) state.cells[r].push(0); }
   var board=document.getElementById('board');
   board.style.gridTemplateColumns='repeat('+n+',1fr)';
@@ -396,11 +416,13 @@ function onBoardDown(e){
   pDown={r:cell.r,c:cell.c,x:e.clientX,y:e.clientY,moved:false,changed:false,mode:mode};
   try{document.getElementById('board').setPointerCapture(e.pointerId);}catch(err){}
 }
+var tutDragCount=0;
 function onBoardMove(e){
   if(!pDown) return;
   var dx=e.clientX-pDown.x, dy=e.clientY-pDown.y;
   if(!pDown.moved&&dx*dx+dy*dy>100) pDown.moved=true;
-  if(pDown.moved){ dragPaint({r:pDown.r,c:pDown.c}); dragPaint(cellFromPoint(e.clientX,e.clientY)); }
+  if(pDown.moved){ dragPaint({r:pDown.r,c:pDown.c}); dragPaint(cellFromPoint(e.clientX,e.clientY));
+    if(tutStep===3){ tutDragCount++; if(tutDragCount>=3){ tutDragCount=0; setTimeout(function(){ tutAdvance(); }, 300); } } }
 }
 function onBoardUp(){
   if(!pDown) return;
@@ -408,7 +430,10 @@ function onBoardUp(){
   if(d.moved) return;
   if(winSeq) return;
   var now=Date.now();
-  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<1000&&lastTap.prev!==null){
+  var isDoubleTap=(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<1000&&lastTap.prev!==null);
+  if(tutStep===1 && !isDoubleTap && d.r===1 && d.c===1){ setTimeout(function(){ tutAdvance(); }, 300); }
+  if(tutStep===2 && isDoubleTap && d.r===4 && d.c===4){ setTimeout(function(){ tutAdvance(); }, 500); }
+  if(isDoubleTap){
     state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
     if(lastTap.prev===1) xTime[d.r+'_'+d.c]=now; else delete xTime[d.r+'_'+d.c];
     lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:null};
@@ -591,6 +616,57 @@ var sfx=(function(){
     place:function(){ tone(1250,0,0.03,'triangle',0.04); tone(820,0.045,0.05,'triangle',0.04); }
   };
 })();
+/* ---- Tutorial ---- */
+var tutStep=0, tutAudio=null;
+function tutPlay(n){
+  if(tutAudio) tutAudio.pause();
+  tutAudio=new Audio('tutorial-line'+n+'.m4a');
+  tutAudio.play().catch(function(){});
+}
+function tutShow(html, showNext){
+  document.getElementById('tutText').innerHTML=html;
+  document.getElementById('tutNext').style.display=showNext?'':'none';
+  document.getElementById('tutOverlay').classList.add('show');
+}
+function tutHide(){ document.getElementById('tutOverlay').classList.remove('show'); clearTutHL(); }
+function clearTutHL(){ var h=document.querySelectorAll('.tutHL'); for(var i=0;i<h.length;i++) h[i].classList.remove('tutHL'); }
+function tutHighlight(r,c){ clearTutHL(); var d=document.getElementById('cell-'+r+'-'+c); if(d) d.classList.add('tutHL'); }
+function startTutorial(){
+  if(lsGet('arch_tutorial_done',false)) return;
+  tutStep=1;
+  tutShow('<b>Welcome to the scan fields.</b><br>Tap the highlighted cell to mark it.', false);
+  tutPlay(1); tutHighlight(1,1);
+}
+function tutAdvance(){
+  clearTutHL();
+  if(tutStep===1){
+    tutStep=2;
+    tutShow('<b>Good.</b><br>Now <b>double-tap</b> the highlighted cell to place a machine.', false);
+    tutPlay(2); tutHighlight(4,4);
+  } else if(tutStep===2){
+    tutStep=3;
+    tutShow('<b>Machine placed.</b><br>Now <b>drag</b> across empty cells to mark them.', false);
+    tutPlay(3);
+  } else if(tutStep===3){
+    tutStep=4;
+    tutShow('<b>One machine per row, column, and region.</b><br>They never touch.', true);
+    tutPlay(4);
+    document.getElementById('tutNext').onclick=function(){ tutAdvance(); };
+  } else if(tutStep===4){
+    tutStep=5;
+    tutShow('The field is yours.', true);
+    tutPlay(5);
+    document.getElementById('tutNext').textContent='Start scanning';
+    document.getElementById('tutNext').onclick=function(){ endTutorial(); };
+  }
+}
+function endTutorial(){
+  tutStep=0; tutHide();
+  if(tutAudio) tutAudio.pause();
+  lsSet('arch_tutorial_done', true);
+  document.getElementById('tutNext').textContent='Got it';
+}
+document.getElementById('tutSkip').onclick=function(){ endTutorial(); };
 var SCAN_COOLDOWN=3*60*1000, askTimer=null;
 function scanReadyAt(){ var t=lsGet('arch_oracle',{})[oracleKey()]; return t||0; }
 function scanCooldownLeft(){ return Math.max(0, scanReadyAt()+SCAN_COOLDOWN-Date.now()); }
