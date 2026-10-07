@@ -139,6 +139,10 @@
     display:flex; flex-direction:column; align-items:flex-start; gap:4px;
   }
   .callmsg:empty{display:none;}
+  #tapdbg{display:none; position:fixed; left:8px; bottom:8px; z-index:99; max-width:94vw;
+    background:rgba(0,0,0,.78); color:#0f0; font:11px/1.5 monospace; padding:8px 10px;
+    border-radius:8px; pointer-events:none; white-space:pre-wrap;}
+  body.debug #tapdbg{display:block;}
   .imsg-who{font-size:12px; font-weight:600; color:#8e8e93; padding-left:12px; letter-spacing:.02em;}
   .imsg-bub{font-size:16px; font-weight:400; color:#111; background:#e9e9eb;
     border-radius:18px; padding:10px 14px; text-align:left; line-height:1.35;
@@ -195,7 +199,7 @@
     <span class="c3"></span><span class="c4"></span>
     <div class="scan-sweep"></div>
     <div id="board"></div>
-    <div class="callmsg" id="callMsg"></div>
+    <div class="callmsg" id="callMsg"></div><div id="tapdbg"></div>
     <div class="board-meta" id="boardMeta"></div>
   </div>
   <div class="hint">Tap: mark &#10005; &middot; Double-tap: place machine &middot; Drag: paint &#10005;</div>
@@ -214,7 +218,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 25</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 26</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -351,6 +355,9 @@ function paint(r,c){
    the iOS touch-stutter where one gesture arrives as tap-then-drag. */
 var xTime={}, FRESH_X_MS=3000;
 var lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:null}, pDown=null;
+var DBG=location.search.indexOf('debug')>=0;
+if(DBG) document.body.classList.add('debug');
+function dbg(m){ if(!DBG) return; var el=document.getElementById('tapdbg'); el.textContent=(m+'\n'+el.textContent).slice(0,600); }
 function cellFromPoint(x,y){
   var el=document.elementFromPoint(x,y);
   if(!el||!el.closest) return null;
@@ -387,6 +394,7 @@ var winSeq=false;
 function onBoardDown(e){
   if(winSeq) return;
   var cell=cellFromPoint(e.clientX,e.clientY);
+  dbg('down '+(cell?cell.r+','+cell.c:'null'));
   if(!cell) return;
   var v=state.cells[cell.r][cell.c], key=cell.r+'_'+cell.c, mode=null;
   if(v===0) mode='add';
@@ -406,7 +414,9 @@ function onBoardUp(){
   if(d.moved) return;
   if(winSeq) return;
   var now=Date.now();
-  if(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<1000&&lastTap.prev!==null){
+  var dt=now-lastTap.t, sameCell=(d.r===lastTap.r&&d.c===lastTap.c);
+  dbg('up '+d.r+','+d.c+' same='+sameCell+' dt='+dt+' prev='+lastTap.prev);
+  if(sameCell&&dt<1000&&lastTap.prev!==null){
     state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
     if(lastTap.prev===1) xTime[d.r+'_'+d.c]=now; else delete xTime[d.r+'_'+d.c];
     lastTap={r:-1,c:-1,x:-1,y:-1,t:0,prev:null};
