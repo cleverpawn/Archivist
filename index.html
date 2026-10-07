@@ -235,7 +235,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 32</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 33</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -635,30 +635,25 @@ function tutHighlight(r,c){ clearTutHL(); var d=document.getElementById('cell-'+
 function startTutorial(){
   if(lsGet('arch_tutorial_done',false)) return;
   tutStep=1;
-  tutShow('<b>Welcome to the scan fields.</b><br>Tap the highlighted cell to mark it.', false);
+  tutShow('<b>Here we are. Welcome to the Scanfields.</b><br>Tap the highlighted cell to mark it empty. That means no machine hides there.', false);
   tutPlay(1); tutHighlight(1,1);
 }
 function tutAdvance(){
   clearTutHL();
   if(tutStep===1){
     tutStep=2;
-    tutShow('<b>Good.</b><br>Now <b>double-tap</b> the highlighted cell to place a machine.', false);
+    tutShow('When you\u2019re sure you found a machine, <b>double-tap</b> the highlighted cell to place a marker there. You\u2019ll see the difference.', false);
     tutPlay(2); tutHighlight(4,4);
   } else if(tutStep===2){
     tutStep=3;
-    tutShow('<b>Machine placed.</b><br>Now <b>drag</b> across empty cells to mark them.', false);
+    tutShow('<b>Drag</b> across the board to mark many cells empty at once. Drag from an old mark to erase.', false);
     tutPlay(3);
   } else if(tutStep===3){
     tutStep=4;
-    tutShow('<b>One machine per row, column, and region.</b><br>They never touch.', true);
+    tutShow('<b>Remember:</b> only one machine per row, column and region. They never touch, not even at the corners. Good luck.', true);
     tutPlay(4);
-    document.getElementById('tutNext').onclick=function(){ tutAdvance(); };
-  } else if(tutStep===4){
-    tutStep=5;
-    tutShow('The field is yours.', true);
-    tutPlay(5);
-    document.getElementById('tutNext').textContent='Start scanning';
     document.getElementById('tutNext').onclick=function(){ endTutorial(); };
+    document.getElementById('tutNext').textContent='Start scanning';
   }
 }
 function endTutorial(){
