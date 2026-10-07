@@ -235,7 +235,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 34</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 35</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -428,12 +428,13 @@ function onBoardMove(e){
 function onBoardUp(){
   if(!pDown) return;
   var d=pDown; pDown=null;
-  if(d.moved) return;
   if(winSeq) return;
   var now=Date.now();
   var isDoubleTap=(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<1000&&lastTap.prev!==null);
-  if(tutStep===1 && !isDoubleTap){ setTimeout(function(){ tutAdvance(); }, 300); }
+  if(tutStep===1 && !d.moved && !isDoubleTap){ setTimeout(function(){ tutAdvance(); }, 300); }
+  else if(tutStep===1 && d.moved){ setTimeout(function(){ tutAdvance(); }, 300); }
   if(tutStep===2 && isDoubleTap){ setTimeout(function(){ tutAdvance(); }, 500); }
+  if(d.moved) return;
   if(isDoubleTap){
     state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
     if(lastTap.prev===1) xTime[d.r+'_'+d.c]=now; else delete xTime[d.r+'_'+d.c];
