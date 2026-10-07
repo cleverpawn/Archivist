@@ -235,7 +235,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 33</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 34</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -432,8 +432,8 @@ function onBoardUp(){
   if(winSeq) return;
   var now=Date.now();
   var isDoubleTap=(d.r===lastTap.r&&d.c===lastTap.c&&now-lastTap.t<1000&&lastTap.prev!==null);
-  if(tutStep===1 && !isDoubleTap && d.r===1 && d.c===1){ setTimeout(function(){ tutAdvance(); }, 300); }
-  if(tutStep===2 && isDoubleTap && d.r===4 && d.c===4){ setTimeout(function(){ tutAdvance(); }, 500); }
+  if(tutStep===1 && !isDoubleTap){ setTimeout(function(){ tutAdvance(); }, 300); }
+  if(tutStep===2 && isDoubleTap){ setTimeout(function(){ tutAdvance(); }, 500); }
   if(isDoubleTap){
     state.cells[d.r][d.c]=lastTap.prev; paint(d.r,d.c);
     if(lastTap.prev===1) xTime[d.r+'_'+d.c]=now; else delete xTime[d.r+'_'+d.c];
@@ -635,22 +635,22 @@ function tutHighlight(r,c){ clearTutHL(); var d=document.getElementById('cell-'+
 function startTutorial(){
   if(lsGet('arch_tutorial_done',false)) return;
   tutStep=1;
-  tutShow('<b>Here we are. Welcome to the Scanfields.</b><br>Tap the highlighted cell to mark it empty. That means no machine hides there.', false);
+  tutShow('Here we are. Welcome to the Scanfields. Tap any cell to mark it empty. That means no machine hides there.', false);
   tutPlay(1); tutHighlight(1,1);
 }
 function tutAdvance(){
   clearTutHL();
   if(tutStep===1){
     tutStep=2;
-    tutShow('When you\u2019re sure you found a machine, <b>double-tap</b> the highlighted cell to place a marker there. You\u2019ll see the difference.', false);
+    tutShow('When you\u2019re sure you found a machine, double-tap to place a marker there. You\u2019ll see the difference.', false);
     tutPlay(2); tutHighlight(4,4);
   } else if(tutStep===2){
     tutStep=3;
-    tutShow('<b>Drag</b> across the board to mark many cells empty at once. Drag from an old mark to erase.', false);
+    tutShow('Drag across the board to mark many cells empty at once. Drag from an old mark to erase.', false);
     tutPlay(3);
   } else if(tutStep===3){
     tutStep=4;
-    tutShow('<b>Remember:</b> only one machine per row, column and region. They never touch, not even at the corners. Good luck.', true);
+    tutShow('Remember, only one machine per row, column and region. They never touch, not even at the corners. Good luck.', true);
     tutPlay(4);
     document.getElementById('tutNext').onclick=function(){ endTutorial(); };
     document.getElementById('tutNext').textContent='Start scanning';
