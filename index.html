@@ -223,6 +223,7 @@
   <div class="actions">
     <div class="btn" id="askBtn">Call the Archivist</div>
     <div class="btn ghost" id="resetBtn">Reset field</div>
+    <div class="btn ghost" id="undoBtn" style="opacity:0.4">Undo</div>
   </div>
   </div>
   <div class="view" id="view-collection">
@@ -235,7 +236,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 39</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 40</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -670,7 +671,7 @@ function endTutorial(){
   if(tutAudio) tutAudio.pause();
   lsSet('arch_tutorial_done', true);
   document.getElementById('tutNext').textContent='Got it';
-  if(typeof resetBoard==='function') resetBoard();
+  render();
 }
 document.getElementById('tutSkip').onclick=function(){ endTutorial(); };
 var SCAN_COOLDOWN=3*60*1000, askTimer=null;
@@ -718,6 +719,7 @@ document.getElementById('askBtn').onclick=function(){
 document.getElementById('scanBtn').onclick=function(){ loadLevel(getLevel()); showView('game'); };
 document.getElementById('sandboxBtn').onclick=function(){ loadSandbox(6,0); showView('game'); };
 document.getElementById('collBtn').onclick=function(){ showView('collection'); };
+document.getElementById('undoBtn').onclick=function(){ doUndo(); };
 document.getElementById('tutBtn').onclick=function(){
   lsSet('arch_tutorial_done', false);
   // Reset to level 1 for tutorial
