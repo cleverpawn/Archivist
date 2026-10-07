@@ -235,7 +235,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 36</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 37</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -670,6 +670,7 @@ function endTutorial(){
   if(tutAudio) tutAudio.pause();
   lsSet('arch_tutorial_done', true);
   document.getElementById('tutNext').textContent='Got it';
+  if(typeof resetBoard==='function') resetBoard();
 }
 document.getElementById('tutSkip').onclick=function(){ endTutorial(); };
 var SCAN_COOLDOWN=3*60*1000, askTimer=null;
