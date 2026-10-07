@@ -214,7 +214,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 23</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 24</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -374,11 +374,7 @@ function placeMachine(r,c){
   if(fi) fi.classList.add('pop');
   var n=P().n, placed=0;
   for(var rr=0;rr<n;rr++) for(var cc=0;cc<n;cc++) if(state.cells[rr][cc]===2) placed++;
-  var key=oracleKey();
-  if(placed===1 && key!==lastOfferKey && !lsGet('arch_oracle',{})[key]){
-    lastOfferKey=key;
-    callMsg('I only have a moment, would you like me to check your scans?', 3000);
-  }
+
   checkWin();
 }
 function dragPaint(cell){
