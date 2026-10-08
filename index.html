@@ -133,6 +133,7 @@
   .actions{display:flex; gap:8px;}
   .actions .btn{flex:1;}
   #askBtn.used{opacity:.35;}
+  #askBtn{min-width:150px; white-space:nowrap; text-align:center;}
   .callmsg{
     position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
     z-index:5; pointer-events:none; max-width:82%; width:max-content;
@@ -236,7 +237,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 41</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 42</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -408,11 +409,32 @@ function dragPaint(cell){
   else if(pDown.mode==='remove'&&v===1){ clearCell(cell.r,cell.c); pDown.changed=true; }
 }
 var winSeq=false;
+var undoStack=[];
+function pushUndo(){
+  try{
+    undoStack.push(state.cells.map(function(row){ return row.slice(); }));
+    if(undoStack.length>100) undoStack.shift();
+  }catch(e){}
+  updateUndoBtn();
+}
+function doUndo(){
+  if(!undoStack.length) return;
+  state.cells=undoStack.pop();
+  var p=P(), n=p.n;
+  for(var r=0;r<n;r++) for(var c=0;c<n;c++) paint(r,c);
+  updateUndoBtn();
+  if(typeof sfx!=='undefined' && sfx.untick) sfx.untick();
+}
+function updateUndoBtn(){
+  var b=document.getElementById('undoBtn');
+  if(b) b.style.opacity=undoStack.length? '1':'0.4';
+}
 function onBoardDown(e){
   if(winSeq) return;
   var cell=cellFromPoint(e.clientX,e.clientY);
   if(!cell) return;
   var v=state.cells[cell.r][cell.c], key=cell.r+'_'+cell.c, mode=null;
+  pushUndo();
   if(v===0) mode='add';
   else if(v===1) mode=(Date.now()-(xTime[key]||0)<FRESH_X_MS)?'add':'remove';
   pDown={r:cell.r,c:cell.c,x:e.clientX,y:e.clientY,moved:false,changed:false,mode:mode};
@@ -564,7 +586,7 @@ function loadSandbox(gs,bi){
   state.mode='sandbox'; state.size=gs; state.bi=bi%BOARDS[gs].length;
   render();
 }
-document.getElementById('resetBtn').onclick=function(){ render(); };
+document.getElementById('resetBtn').onclick=function(){ undoStack=[]; updateUndoBtn(); render(); };
 var callMsgToken=0;
 function callMsg(t, ms){
   var m=document.getElementById('callMsg'), tok=++callMsgToken;
