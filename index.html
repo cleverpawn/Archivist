@@ -160,7 +160,7 @@
     border-radius:18px; padding:10px 14px; text-align:left; line-height:1.35;
     max-width:280px; box-shadow:0 1px 2px rgba(0,0,0,.12);}
   .board-shell.scanning .scan-sweep::before{
-    background:linear-gradient(180deg, transparent, rgba(11,143,132,.8), transparent);
+    background:linear-gradient(180deg, transparent, rgba(11,143,132,.72), transparent);
     animation-duration:1.1s;
   }
   .cell.flagged{box-shadow:inset 0 0 0 3px rgba(200,30,30,.95); animation:flagpulse .7s ease-out 3;}
@@ -226,6 +226,7 @@
     <div class="btn" id="askBtn">Call the Archivist</div>
     <div class="btn ghost" id="resetBtn">Reset field</div>
     <div class="btn ghost" id="undoBtn" style="opacity:0.4">Undo</div>
+    <div class="btn ghost" id="muteBtn2">🔊</div>
   </div>
   </div>
   <div class="view" id="view-collection">
@@ -238,7 +239,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 44</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 45</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -601,6 +602,8 @@ function setMuted(m){
   muted=m; lsSet('arch_muted', m);
   var b=document.getElementById('muteBtn');
   if(b) b.textContent=m?'🔇 Sound off':'🔊 Sound on';
+  var b2=document.getElementById('muteBtn2');
+  if(b2) b2.textContent=m?'🔇':'🔊';
 }
 var sfx=(function(){
   var ctx=null;
@@ -752,6 +755,7 @@ document.getElementById('sandboxBtn').onclick=function(){ loadSandbox(6,0); show
 document.getElementById('collBtn').onclick=function(){ showView('collection'); };
 document.getElementById('undoBtn').onclick=function(){ doUndo(); };
 document.getElementById('muteBtn').onclick=function(){ setMuted(!muted); };
+document.getElementById('muteBtn2').onclick=function(){ setMuted(!muted); };
 document.getElementById('tutBtn').onclick=function(){
   lsSet('arch_tutorial_done', false);
   // Reset to level 1 for tutorial
