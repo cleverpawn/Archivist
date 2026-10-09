@@ -66,7 +66,7 @@
   }
   .scan-sweep::before{
     content:""; position:absolute; left:0; right:0; height:56px; top:-60px;
-    background:linear-gradient(180deg, transparent, rgba(11,143,132,.3), transparent);
+    background:linear-gradient(180deg, transparent, rgba(11,143,132,.2), transparent);
     animation:sweep 5s linear infinite;
   }
   @keyframes sweep{to{transform:translateY(560px)}}
@@ -226,7 +226,7 @@
     <div class="btn" id="askBtn">Call the Archivist</div>
     <div class="btn ghost" id="resetBtn">Reset field</div>
     <div class="btn ghost" id="undoBtn" style="opacity:0.4">Undo</div>
-    <div class="btn ghost" id="muteBtn2">🔊</div>
+    <div class="btn ghost" id="muteBtn2" style="font-size:22px; padding:10px 16px;">🔊</div>
   </div>
   </div>
   <div class="view" id="view-collection">
@@ -239,7 +239,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 45</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 46</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
