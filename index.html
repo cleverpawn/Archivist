@@ -198,6 +198,7 @@
       <div class="btn ghost" id="sandboxBtn">Sandbox</div>
       <div class="btn ghost" id="collBtn">Collection</div>
       <div class="btn ghost" id="tutBtn">Tutorial</div>
+      <div class="btn ghost" id="muteBtn">🔊 Sound on</div>
       <div class="hstat" id="homeStat"></div>
     </div>
   </div>
@@ -237,7 +238,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 43</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 44</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -429,6 +430,7 @@ function updateUndoBtn(){
   var b=document.getElementById('undoBtn');
   if(b) b.style.opacity=undoStack.length? '1':'0.4';
 }
+setMuted(muted);
 function onBoardDown(e){
   if(winSeq) return;
   var cell=cellFromPoint(e.clientX,e.clientY);
@@ -594,6 +596,12 @@ function callMsg(t, ms){
   m.querySelector('.imsg-bub').textContent=t;
   if(ms) setTimeout(function(){ if(tok===callMsgToken) m.innerHTML=''; }, ms);
 }
+var muted=lsGet('arch_muted', false);
+function setMuted(m){
+  muted=m; lsSet('arch_muted', m);
+  var b=document.getElementById('muteBtn');
+  if(b) b.textContent=m?'🔇 Sound off':'🔊 Sound on';
+}
 var sfx=(function(){
   var ctx=null;
   function ensure(){
@@ -632,18 +640,19 @@ var sfx=(function(){
     }catch(e){}
   }
   return {
-    scan:function(){ ensure(); tone(740,0,0.07,'square',0.07); tone(1108,0.1,0.07,'square',0.07); sweep(280,1350,0.2,1.9,0.05); },
-    alert:function(){ tone(520,0,0.1,'square',0.08); tone(392,0.12,0.16,'square',0.08); },
-    clear:function(){ tone(880,0,0.1,'sine',0.09); tone(1318,0.11,0.18,'sine',0.09); },
-    win:function(){ ensure(); sweep(300,1600,0,2.0,0.06); tone(880,1.9,0.12,'sine',0.09); tone(1174,2.02,0.22,'sine',0.09); },
-    tick:function(){ tone(1150,0,0.025,'triangle',0.035); },
-    untick:function(){ tone(580,0,0.03,'triangle',0.03); },
-    place:function(){ tone(1250,0,0.03,'triangle',0.04); tone(820,0.045,0.05,'triangle',0.04); }
+    scan:function(){ if(muted) return; ensure(); tone(740,0,0.07,'square',0.07); tone(1108,0.1,0.07,'square',0.07); sweep(280,1350,0.2,1.9,0.05); },
+    alert:function(){ if(muted) return; tone(520,0,0.1,'square',0.08); tone(392,0.12,0.16,'square',0.08); },
+    clear:function(){ if(muted) return; tone(880,0,0.1,'sine',0.09); tone(1318,0.11,0.18,'sine',0.09); },
+    win:function(){ if(muted) return; ensure(); sweep(300,1600,0,2.0,0.06); tone(880,1.9,0.12,'sine',0.09); tone(1174,2.02,0.22,'sine',0.09); },
+    tick:function(){ if(muted) return; tone(1150,0,0.025,'triangle',0.035); },
+    untick:function(){ if(muted) return; tone(580,0,0.03,'triangle',0.03); },
+    place:function(){ if(muted) return; tone(1250,0,0.03,'triangle',0.04); tone(820,0.045,0.05,'triangle',0.04); }
   };
 })();
 /* ---- Tutorial ---- */
 var tutStep=0, tutAudio=null;
 function tutPlay(n){
+  if(muted) return;
   if(tutAudio) tutAudio.pause();
   tutAudio=tutPreloaded[n]||new Audio('tutorial-line'+n+'.m4a');
   tutAudio.currentTime=0;
@@ -742,6 +751,7 @@ document.getElementById('scanBtn').onclick=function(){ loadLevel(getLevel()); sh
 document.getElementById('sandboxBtn').onclick=function(){ loadSandbox(6,0); showView('game'); };
 document.getElementById('collBtn').onclick=function(){ showView('collection'); };
 document.getElementById('undoBtn').onclick=function(){ doUndo(); };
+document.getElementById('muteBtn').onclick=function(){ setMuted(!muted); };
 document.getElementById('tutBtn').onclick=function(){
   lsSet('arch_tutorial_done', false);
   // Reset to level 1 for tutorial
