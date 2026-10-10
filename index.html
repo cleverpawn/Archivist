@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 73</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 74</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -569,6 +569,30 @@ var TIER_STORIES={
   5:'Ancient machinery stirs in the deep fields.',
   6:'The final threshold. The rarest anomalies appear.'
 };
+function showIntroStory(){
+  var html='<div style="text-align:center;padding:24px;max-width:420px;">'+
+    '<div style="font-size:12px;letter-spacing:3px;color:#0a7a6b;margin-bottom:8px;">ARCHIVIST LOG</div>'+
+    '<div style="font-size:22px;font-weight:800;margin-bottom:12px;">The Scanfields</div>'+
+    '<div style="font-size:14px;color:#444;line-height:1.6;text-align:left;">'+
+    '<p>Machines are crossing over from other worlds. They hide in the scan fields, one per row, column, and region. They never touch — not even at the corners.</p>'+
+    '<p>You are the Archivist. Find them. Log them. Catalog the anomalies.</p>'+
+    '</div>'+
+    '<div class="btn" id="introBeginBtn" style="margin-top:20px;">Begin</div></div>';
+  var m=document.getElementById('introStoryModal');
+  if(!m){
+    m=document.createElement('div'); m.id='introStoryModal';
+    m.style.cssText='display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:1001;align-items:center;justify-content:center;';
+    m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:90%;max-height:90%;overflow:auto;">'+html+'</div>';
+    document.body.appendChild(m);
+  } else {
+    m.querySelector('div').innerHTML=html;
+  }
+  m.classList.add('show'); m.style.display='flex';
+  document.getElementById('introBeginBtn').onclick=function(){
+    m.classList.remove('show'); m.style.display='none';
+    loadLevel(1); showView('game'); setTimeout(startTutorial, 500);
+  };
+}
 function playTierVideo(tier){
   if(tier<2||tier>6) return;
   var names={2:['Clock-Owl','Cinder-Hound','Iron-Heron'],3:['Bolt-Stag','Echo-Manta','Iron-Bear'],4:['Frost-Spider'],5:['Gear-Dragon'],6:['Solar-Koi']}[tier];
@@ -824,7 +848,7 @@ document.getElementById('scanBtn').onclick=function(e){
   if(e && e.isTrusted===false) return;
   if(!lsGet('arch_intro_seen',false)){
     lsSet('arch_intro_seen', true);
-    loadLevel(1); showView('game'); setTimeout(startTutorial, 500);
+    showIntroStory();
   } else {
     var lv=getLevel();
     loadLevel(lv); showView('game');
