@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 68</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 69</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -546,11 +546,16 @@ var _introCb=null;
 function playIntroVideo(cb){
   if(muted){ if(cb) cb(); return; }
   var v=document.getElementById('tierVideo');
+  // Don't restart if already playing
+  if(!v.paused && v.src.indexOf('intro.mp4')!==-1) return;
   v.src='intro.mp4?v=2';
-  v.load();
   document.getElementById('videoModal').classList.add('show');
-  v.play().catch(function(){});
   _introCb=cb;
+  var _tryPlay=function(){
+    if(v.readyState>=2){ v.play().catch(function(){}); }
+    else { v.addEventListener('canplay', function h(){ v.removeEventListener('canplay', h); v.play().catch(function(){}); }); }
+  };
+  v.load(); _tryPlay();
   v.onended=function(){
     document.getElementById('videoModal').classList.remove('show');
     v.removeAttribute('src'); v.load();
@@ -796,7 +801,6 @@ document.getElementById('scanBtn').onclick=function(e){
   if(e && e.isTrusted===false) return;
   if(!lsGet('arch_intro_seen',false)){
     lsSet('arch_intro_seen', true);
-    var _btn=this; _btn.style.pointerEvents='none'; _btn.style.opacity='0.5';
     playIntroVideo(function(){ loadLevel(1); showView('game'); setTimeout(startTutorial, 500); });
   } else {
     var lv=getLevel();
