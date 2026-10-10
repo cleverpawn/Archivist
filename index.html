@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 65</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 66</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -546,7 +546,7 @@ var _introCb=null;
 function playIntroVideo(cb){
   if(muted){ if(cb) cb(); return; }
   var v=document.getElementById('tierVideo');
-  v.src='intro.mp4';
+  v.src='intro.mp4?v=2';
   document.getElementById('videoModal').classList.add('show');
   v.play().catch(function(){});
   _introCb=cb;
