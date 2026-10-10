@@ -244,7 +244,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 52</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 53</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -334,7 +334,14 @@ function render(){
   updateAskBtn();
   document.getElementById('callMsg').textContent='';
   state.cells=[];
-  if(state.level===1 && state.mode==='ladder' && !lsGet('arch_tutorial_done',false)) setTimeout(startTutorial, 800);
+  if(state.level===1 && state.mode==='ladder' && !lsGet('arch_tutorial_done',false)){
+    if(!lsGet('arch_intro_seen',false)){
+      lsSet('arch_intro_seen', true);
+      setTimeout(function(){ playIntroVideo(function(){ setTimeout(startTutorial, 500); }); }, 800);
+    } else {
+      setTimeout(startTutorial, 800);
+    }
+  }
   for(var r=0;r<n;r++){ state.cells.push([]); for(var c=0;c<n;c++) state.cells[r].push(0); }
   var board=document.getElementById('board');
   board.style.gridTemplateColumns='repeat('+n+',1fr)';
@@ -540,6 +547,18 @@ function getLevel(){ var v=lsGet('arch_level',null); if(v===null){ v=1; lsSet('a
 function setLevel(v){ v=Math.max(1,Math.min(MAX_LEVEL,v)); lsSet('arch_level',v); return v; }
 function tierNameFor(t){ for(var i=0;i<TYPES.length;i++) if(TYPES[i].tier===t) return TYPES[i].tierName; return ''; }
 /* completed level -> newly unlocked tier (0 if none) */
+function playIntroVideo(cb){
+  if(muted){ if(cb) cb(); return; }
+  var v=document.getElementById('tierVideo');
+  v.src='intro.mp4';
+  document.getElementById('videoModal').classList.add('show');
+  v.play().catch(function(){});
+  v.onended=function(){
+    document.getElementById('videoModal').classList.remove('show');
+    v.removeAttribute('src'); v.load();
+    if(cb) cb();
+  };
+}
 function playTierVideo(tier){
   if(muted) return;
   var v=document.getElementById('tierVideo');
