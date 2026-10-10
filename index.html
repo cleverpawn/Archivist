@@ -200,6 +200,7 @@
       <h1>Cross-World Archivist</h1>
       <div class="sub">Log every machine. Complete the scan.</div>
       <div class="btn" id="scanBtn">Begin scan</div>
+      <div class="btn ghost" id="introBtn" style="margin-top:8px; display:none;">Watch Intro</div>
       <div class="btn ghost" id="sandboxBtn">Sandbox</div>
       <div class="btn ghost" id="collBtn">Collection</div>
       <div class="btn ghost" id="tutBtn">Tutorial</div>
@@ -245,7 +246,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 69</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 70</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -599,6 +600,7 @@ function renderHome(){
   var st=collStats(), gl=getLevel();
   var _seen=lsGet('arch_intro_seen',false);
   document.getElementById('scanBtn').textContent = !_seen ? 'Start Your Journey' : (gl<=1 ? 'Begin scan' : 'Continue scan');
+  document.getElementById('introBtn').style.display = !_seen ? 'block' : 'none';
   document.getElementById('homeStat').innerHTML =
     'Level <b>'+gl+'</b> of '+MAX_LEVEL+' &middot; <b>'+st.found+'</b> of '+st.total+' cataloged';
   for(var i=0;i<TYPES.length;i++) if(TYPES[i].key==='dragon'){
@@ -801,12 +803,16 @@ document.getElementById('scanBtn').onclick=function(e){
   if(e && e.isTrusted===false) return;
   if(!lsGet('arch_intro_seen',false)){
     lsSet('arch_intro_seen', true);
-    playIntroVideo(function(){ loadLevel(1); showView('game'); setTimeout(startTutorial, 500); });
+    loadLevel(1); showView('game'); setTimeout(startTutorial, 500);
   } else {
     var lv=getLevel();
     loadLevel(lv); showView('game');
     if(lv===1 && !lsGet('arch_tutorial_done',false)) setTimeout(startTutorial, 800);
   }
+};
+document.getElementById('introBtn').onclick=function(){
+  lsSet('arch_intro_seen', true);
+  playIntroVideo(function(){ renderHome(); });
 };
 document.getElementById('sandboxBtn').onclick=function(){ loadSandbox(6,0); showView('game'); };
 document.getElementById('collBtn').onclick=function(){ showView('collection'); };
