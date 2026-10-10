@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 62</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 63</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -337,12 +337,7 @@ function render(){
   document.getElementById('callMsg').textContent='';
   state.cells=[];
   if(state.level===1 && state.mode==='ladder' && !lsGet('arch_tutorial_done',false)){
-    if(!lsGet('arch_intro_seen',false)){
-      lsSet('arch_intro_seen', true);
-      setTimeout(function(){ playIntroVideo(function(){ setTimeout(startTutorial, 500); }); }, 800);
-    } else {
-      setTimeout(startTutorial, 800);
-    }
+    setTimeout(startTutorial, 800);
   }
   for(var r=0;r<n;r++){ state.cells.push([]); for(var c=0;c<n;c++) state.cells[r].push(0); }
   var board=document.getElementById('board');
@@ -598,7 +593,8 @@ function collStats(){
 }
 function renderHome(){
   var st=collStats(), gl=getLevel();
-  document.getElementById('scanBtn').textContent = gl<=1 ? 'Begin scan' : 'Continue scan';
+  var _seen=lsGet('arch_intro_seen',false);
+  document.getElementById('scanBtn').textContent = !_seen ? 'Start Your Journey' : (gl<=1 ? 'Begin scan' : 'Continue scan');
   document.getElementById('homeStat').innerHTML =
     'Level <b>'+gl+'</b> of '+MAX_LEVEL+' &middot; <b>'+st.found+'</b> of '+st.total+' cataloged';
   for(var i=0;i<TYPES.length;i++) if(TYPES[i].key==='dragon'){
@@ -797,7 +793,14 @@ document.getElementById('askBtn').onclick=function(){
     }, 2200);
   }, 1200);
 };
-document.getElementById('scanBtn').onclick=function(){ loadLevel(getLevel()); showView('game'); };
+document.getElementById('scanBtn').onclick=function(){
+  if(!lsGet('arch_intro_seen',false)){
+    lsSet('arch_intro_seen', true);
+    playIntroVideo(function(){ loadLevel(1); showView('game'); setTimeout(startTutorial, 500); });
+  } else {
+    loadLevel(getLevel()); showView('game');
+  }
+};
 document.getElementById('sandboxBtn').onclick=function(){ loadSandbox(6,0); showView('game'); };
 document.getElementById('collBtn').onclick=function(){ showView('collection'); };
 document.getElementById('undoBtn').onclick=function(){ doUndo(); };
