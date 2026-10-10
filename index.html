@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 63</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 64</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -793,7 +793,8 @@ document.getElementById('askBtn').onclick=function(){
     }, 2200);
   }, 1200);
 };
-document.getElementById('scanBtn').onclick=function(){
+document.getElementById('scanBtn').onclick=function(e){
+  if(e && e.isTrusted===false) return;
   if(!lsGet('arch_intro_seen',false)){
     lsSet('arch_intro_seen', true);
     playIntroVideo(function(){ loadLevel(1); showView('game'); setTimeout(startTutorial, 500); });
