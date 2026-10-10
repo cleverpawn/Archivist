@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 66</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 67</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -841,8 +841,13 @@ window.__scan={
   onBoardDown:onBoardDown, onBoardMove:onBoardMove, onBoardUp:onBoardUp,
   solution:function(){ return P().solution.slice(); }
 };
+if(location.search.indexOf('fresh')!==-1){
+  Object.keys(localStorage).forEach(function(k){ if(k.indexOf('arch_')===0) localStorage.removeItem(k); });
+  location.href=location.pathname+'?v=67';
+} else {
 render();
 renderHome();
+}
 if(location.search.indexOf('demo=win')!==-1){
   showView('game');
   var sol=P().solution;
