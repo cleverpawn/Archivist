@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 64</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 65</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -336,9 +336,7 @@ function render(){
   updateAskBtn();
   document.getElementById('callMsg').textContent='';
   state.cells=[];
-  if(state.level===1 && state.mode==='ladder' && !lsGet('arch_tutorial_done',false)){
-    setTimeout(startTutorial, 800);
-  }
+  /* Tutorial is started explicitly from button handlers, never auto. */
   for(var r=0;r<n;r++){ state.cells.push([]); for(var c=0;c<n;c++) state.cells[r].push(0); }
   var board=document.getElementById('board');
   board.style.gridTemplateColumns='repeat('+n+',1fr)';
@@ -799,7 +797,9 @@ document.getElementById('scanBtn').onclick=function(e){
     lsSet('arch_intro_seen', true);
     playIntroVideo(function(){ loadLevel(1); showView('game'); setTimeout(startTutorial, 500); });
   } else {
-    loadLevel(getLevel()); showView('game');
+    var lv=getLevel();
+    loadLevel(lv); showView('game');
+    if(lv===1 && !lsGet('arch_tutorial_done',false)) setTimeout(startTutorial, 800);
   }
 };
 document.getElementById('sandboxBtn').onclick=function(){ loadSandbox(6,0); showView('game'); };
