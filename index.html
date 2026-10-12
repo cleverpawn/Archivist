@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 74</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 75</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -604,7 +604,7 @@ function playTierVideo(tier){
   for(var i=0;i<TYPES.length;i++){ if(TYPES[i].tier===tier){
     html+='<div style="text-align:center;"><img src="'+TYPES[i].icon+'" style="width:64px;height:64px;"/><div style="font-size:11px;margin-top:4px;">'+TYPES[i].name+'</div></div>';
   }}
-  html+='</div><div class="btn" onclick="document.getElementById(&apos;tierStoryModal&apos;).classList.remove(&apos;show&apos;);" style="margin-top:20px;">Continue</div></div>';
+  html+='</div><div class="btn" id="tierContinueBtn" style="margin-top:20px;">Continue</div></div>';
   var m=document.getElementById('tierStoryModal');
   if(!m){
     m=document.createElement('div'); m.id='tierStoryModal';
@@ -615,6 +615,9 @@ function playTierVideo(tier){
     m.querySelector('div').innerHTML=html;
   }
   m.classList.add('show'); m.style.display='flex';
+  document.getElementById('tierContinueBtn').onclick=function(){
+    m.classList.remove('show'); m.style.display='none';
+  };
 }
 var _videoCloseWired=false;
 function wireVideoClose(){
