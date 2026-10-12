@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 76</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 77</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -901,6 +901,28 @@ if(location.search.indexOf('fresh')!==-1){
   Object.keys(localStorage).forEach(function(k){ if(k.indexOf('arch_')===0) localStorage.removeItem(k); });
   location.href=location.pathname+'?v=67';
 } else {
+/* iOS PWA: unlock audio on first tap */
+(function(){
+  var _unlocked=false;
+  function _unlock(){
+    if(_unlocked) return; _unlocked=true;
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext;
+      if(AC){
+        var c=new AC();
+        if(c.state==='suspended') c.resume();
+        c.close();
+      }
+    }catch(e){}
+    try{
+      var a=new Audio(); a.volume=0;
+      var p=a.play(); if(p&&p.catch) p.catch(function(){});
+    }catch(e){}
+  }
+  ['touchstart','touchend','click'].forEach(function(ev){
+    document.addEventListener(ev,_unlock,{once:true,passive:true});
+  });
+})();
 render();
 renderHome();
 }
