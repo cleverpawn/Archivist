@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 75</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 76</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -571,9 +571,9 @@ var TIER_STORIES={
 };
 function showIntroStory(){
   var html='<div style="text-align:center;padding:24px;max-width:420px;">'+
-    '<div style="font-size:12px;letter-spacing:3px;color:#0a7a6b;margin-bottom:8px;">ARCHIVIST LOG</div>'+
-    '<div style="font-size:22px;font-weight:800;margin-bottom:12px;">The Scanfields</div>'+
-    '<div style="font-size:14px;color:#444;line-height:1.6;text-align:left;">'+
+    '<div style="font-size:15px;letter-spacing:3px;color:#0a7a6b;margin-bottom:8px;">ARCHIVIST LOG</div>'+
+    '<div style="font-size:28px;font-weight:800;margin-bottom:12px;">The Scanfields</div>'+
+    '<div style="font-size:17px;color:#444;line-height:1.6;text-align:left;">'+
     '<p>Machines are crossing over from other worlds. They hide in the scan fields, one per row, column, and region. They never touch — not even at the corners.</p>'+
     '<p>You are the Archivist. Find them. Log them. Catalog the anomalies.</p>'+
     '</div>'+
@@ -597,12 +597,12 @@ function playTierVideo(tier){
   if(tier<2||tier>6) return;
   var names={2:['Clock-Owl','Cinder-Hound','Iron-Heron'],3:['Bolt-Stag','Echo-Manta','Iron-Bear'],4:['Frost-Spider'],5:['Gear-Dragon'],6:['Solar-Koi']}[tier];
   var html='<div style="text-align:center;padding:20px;">'+
-    '<div style="font-size:12px;letter-spacing:3px;color:#0a7a6b;margin-bottom:8px;">ARCHIVIST LOG</div>'+
-    '<div style="font-size:24px;font-weight:800;margin-bottom:8px;">TIER '+tier+' UNLOCKED</div>'+
-    '<div style="font-size:14px;color:#555;margin-bottom:16px;">'+TIER_STORIES[tier]+'</div>'+
+    '<div style="font-size:15px;letter-spacing:3px;color:#0a7a6b;margin-bottom:8px;">ARCHIVIST LOG</div>'+
+    '<div style="font-size:30px;font-weight:800;margin-bottom:8px;">TIER '+tier+' UNLOCKED</div>'+
+    '<div style="font-size:17px;color:#555;margin-bottom:16px;line-height:1.5;">'+TIER_STORIES[tier]+'</div>'+
     '<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">';
   for(var i=0;i<TYPES.length;i++){ if(TYPES[i].tier===tier){
-    html+='<div style="text-align:center;"><img src="'+TYPES[i].icon+'" style="width:64px;height:64px;"/><div style="font-size:11px;margin-top:4px;">'+TYPES[i].name+'</div></div>';
+    html+='<div style="text-align:center;"><img src="'+TYPES[i].icon+'" style="width:80px;height:80px;"/><div style="font-size:14px;margin-top:4px;">'+TYPES[i].name+'</div></div>';
   }}
   html+='</div><div class="btn" id="tierContinueBtn" style="margin-top:20px;">Continue</div></div>';
   var m=document.getElementById('tierStoryModal');
