@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 79</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 80</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -313,7 +313,7 @@ function render(){
   var p=P(), n=p.n;
   curAssign=assignmentFor(state.level);
   document.getElementById('anomalyName').textContent =
-    state.mode==='ladder' ? 'Level '+state.level+' — '+p.name : 'Board '+(state.bi+1);
+    state.mode==='ladder' ? 'Level '+state.level+' — Grid #'+(DEALER[state.level-1][1]+1) : 'Board '+(state.bi+1);
   document.getElementById('boardMeta').innerHTML =
     '<span>Grid <b>'+n+'&times;'+n+'</b></span>'+
     '<span>Machines <b>'+n+'</b></span>'+
@@ -511,7 +511,7 @@ function checkWin(){
 function showWin(tierHit){
   var p=P(), n=p.n;
   document.getElementById('winName').textContent =
-    (state.mode==='ladder' ? 'Level '+state.level+' — ' : '')+p.name;
+    state.mode==='ladder' ? 'Level '+state.level+' — Grid #'+(DEALER[state.level-1][1]+1) : 'Board '+(state.bi+1);
   var tb=document.getElementById('tierBanner');
   if(tierHit>0){
     /* Hook for the tier-reveal cinematic: play it here when locked. */
