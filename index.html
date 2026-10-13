@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 81</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 82</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -281,9 +281,9 @@ var TYPES = [
 ];
 var SIZES = [6,7,8,9,10,11,12];
 function gridNum(size, idx){
-  var x=((idx+1)*2654435761 + size*40503)>>>0;
-  x=(x^(x>>>13))%900000;
-  return x+100000;
+  var OFF={6:0,7:20,8:570,9:1170,10:1920,11:2320,12:2520};
+  var g=(OFF[size]||0)+idx;
+  return 100000+((g*7919+54321)%900000);
 }
 function tiersForLevel(L){ return L>=401?6 : L>=251?5 : L>=151?4 : L>=51?3 : L>=21?2 : 1; }
 function tierLabelFor(L){ var t=tiersForLevel(L); return t>1 ? 'TIER 1\u2013'+t : 'TIER 1'; }
