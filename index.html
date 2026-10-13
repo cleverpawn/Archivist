@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 78</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 79</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -703,12 +703,11 @@ function setMuted(m){
   if(b2) b2.textContent=m?'🔇':'🔊';
 }
 var sfx=(function(){
-  var ctx=null;
   function ensure(){
     try{
-      if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)();
-      if(ctx.state==='suspended') ctx.resume();
-      return ctx;
+      if(!window.__archCtx) window.__archCtx=new (window.AudioContext||window.webkitAudioContext)();
+      if(window.__archCtx.state==='suspended') window.__archCtx.resume();
+      return window.__archCtx;
     }catch(e){ return null; }
   }
   function tone(freq,t0,dur,type,vol){
@@ -754,8 +753,7 @@ var tutStep=0, tutAudio=null;
 function tutPlay(n){
   if(muted) return;
   if(tutAudio) tutAudio.pause();
-  tutAudio=tutPreloaded[n]||new Audio('tutorial-line'+n+'.m4a');
-  tutAudio.currentTime=0;
+  tutAudio=new Audio('tutorial-line'+n+'.m4a');
   tutAudio.play().catch(function(){});
 }
 function tutShow(html, showNext){
@@ -767,11 +765,7 @@ function tutHide(){ document.getElementById('tutOverlay').classList.remove('show
 function clearTutHL(){ var h=document.querySelectorAll('.tutHL'); for(var i=0;i<h.length;i++) h[i].classList.remove('tutHL'); }
 function tutHighlight(r,c){ clearTutHL(); var d=document.getElementById('cell-'+r+'-'+c); if(d) d.classList.add('tutHL'); }
 var tutPreloaded={};
-function tutPreload(){
-  for(var i=1;i<=4;i++){
-    if(!tutPreloaded[i]){ var a=new Audio('tutorial-line'+i+'.m4a'); a.preload='auto'; a.load(); tutPreloaded[i]=a; }
-  }
-}
+function tutPreload(){ /* No preload: iOS requires fresh Audio after a user gesture. */ }
 function startTutorial(){
   if(lsGet('arch_tutorial_done',false)) return;
   tutPreload();
@@ -901,26 +895,18 @@ if(location.search.indexOf('fresh')!==-1){
   Object.keys(localStorage).forEach(function(k){ if(k.indexOf('arch_')===0) localStorage.removeItem(k); });
   location.href=location.pathname+'?v=67';
 } else {
-/* iOS PWA: unlock audio on first tap */
+/* iOS PWA: keep audio unlocked on every tap */
 (function(){
-  var _unlocked=false;
   function _unlock(){
-    if(_unlocked) return; _unlocked=true;
     try{
       var AC=window.AudioContext||window.webkitAudioContext;
-      if(AC){
-        var c=new AC();
-        if(c.state==='suspended') c.resume();
-        c.close();
+      if(AC && window.__archCtx){
+        if(window.__archCtx.state==='suspended') window.__archCtx.resume();
       }
     }catch(e){}
-    try{
-      var a=new Audio(); a.volume=0;
-      var p=a.play(); if(p&&p.catch) p.catch(function(){});
-    }catch(e){}
   }
-  ['touchstart','touchend','click'].forEach(function(ev){
-    document.addEventListener(ev,_unlock,{once:true,passive:true});
+  ['touchstart','pointerdown','click'].forEach(function(ev){
+    document.addEventListener(ev,_unlock,{passive:true});
   });
 })();
 render();
