@@ -150,6 +150,16 @@
   .sheet-photo{width:100%; border-radius:12px; display:block; margin:4px 0 6px;}
   .sheet-cap{font-size:13px; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; text-align:left; margin:10px 0 6px;}
   .sheet-notes{text-align:left; font-size:16px; line-height:1.6; color:#33475e; border:1px solid #d5dde6; border-radius:12px; padding:13px 16px;}
+  .dossier{background:radial-gradient(120% 100% at 50% 0%, #2b4258 0%, #182430 60%, #0e1620 100%); border-radius:14px; padding:18px 16px; margin-top:14px; color:#eaf2f8;}
+  .dossier .dk{font-size:12px; letter-spacing:.3em; color:#39d5c0; text-transform:uppercase; text-align:center;}
+  .dossier .dchips{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:14px 0 6px;}
+  .dossier .dchip{background:rgba(255,255,255,.08); border:1px solid rgba(57,213,192,.5); border-radius:999px; padding:7px 12px; font-size:12.5px; color:#eaf2f8;}
+  .dossier .dchip b{color:#39d5c0;}
+  .dossier .dsig{text-align:left; font-size:11px; letter-spacing:.2em; color:#9fb6c9; text-transform:uppercase; margin-top:12px;}
+  .dossier .dbar{height:7px; background:rgba(255,255,255,.14); border-radius:4px; margin-top:6px; overflow:hidden;}
+  .dossier .dbar i{display:block; height:100%; background:#39d5c0;}
+  .dossier .dremark{margin-top:14px; font-size:15px; line-height:1.55; font-style:italic; color:#cfe0ee; text-align:left;}
+  .dossier .dwho{margin-top:6px; font-size:11.5px; letter-spacing:.18em; color:#7e97ad; text-transform:uppercase; text-align:left;}
   .cat-item{cursor:pointer;}
   .actions{display:flex; gap:8px;}
   .actions .btn{flex:1;}
@@ -265,7 +275,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 85</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 86</div>
 </div>
 <div class="overlay" id="sheetOverlay">
   <div class="sheet-card" id="sheetCard"></div>
@@ -706,18 +716,18 @@ function renderCollection(){
   });
 }
 var DETAILS={
-  cricket:{drive:'Pulse resonator', notes:'It broadcasts a slow, steady pulse through the ground. Other machines seem to keep time with it \u2014 where you hear one, look for more.'},
-  fox:{drive:'Boiler heart', notes:'Vents steam when it thinks no one is watching. It slips between worlds along old rail lines and river bends.'},
-  turtle:{drive:'Gyroscope', notes:'Its inner rings never stop turning, even when the shell is still. It always points toward the nearest crossing.'},
-  owl:{drive:'Clockwork', notes:'Keeps perfect time with a world that isn\u2019t ours. Its eyes sweep like second hands \u2014 when both stop at once, another anomaly is near.'},
-  hound:{drive:'Ember core', notes:'Embers glow in its joints when it catches a scent from across the veil. It tracks signals the way a dog tracks game.'},
-  heron:{drive:'Hydraulic piston', notes:'Stands motionless in marsh water for days, waiting. What it waits for, no Archivist has recorded.'},
-  stag:{drive:'Tesla coil', notes:'Its antlers arc with stored lightning after storms. It appears where the air still hums.'},
-  manta:{drive:'Sonar foil', notes:'It reads the fields by echo, the way its kin read the sea. Every pass redraws its map of our world.'},
-  bear:{drive:'Riveted furnace', notes:'Slow, deliberate, and very hard to move once it settles. Older files claim it guards the oldest crossings.'},
-  spider:{drive:'Cryo lattice', notes:'Frost spreads from wherever it stands, even in summer. It weaves its web across the thinnest places.'},
-  dragon:{drive:'Grand gearwork', notes:'Every gear in it turns another gear in some other machine, somewhere else. The oldest design in the archive.'},
-  koi:{drive:'Photonic scale', notes:'It swims through light the way its kin swim through water. Sightings are brief, bright, and almost never believed.'}
+  cricket:{drive:'Pulse resonator', temper:'Steady', origin:'World V-3 \u00b7 Verdance', signal:38, remark:'The metronome of the fields. Everything else keeps its time.', notes:'It broadcasts a slow, steady pulse through the ground. Other machines seem to keep time with it \u2014 where you hear one, look for more.'},
+  fox:{drive:'Boiler heart', temper:'Skittish', origin:'World R-9 \u00b7 Cindervale', signal:44, remark:'Never logged the same grid twice. It knows the way home \u2014 ours is just a shortcut.', notes:'Vents steam when it thinks no one is watching. It slips between worlds along old rail lines and river bends.'},
+  turtle:{drive:'Gyroscope', temper:'Docile', origin:'World T-1 \u00b7 Slowater', signal:41, remark:'Point it anywhere you like. By morning it faces the crossing again.', notes:'Its inner rings never stop turning, even when the shell is still. It always points toward the nearest crossing.'},
+  owl:{drive:'Clockwork', temper:'Watchful', origin:'World K-7 \u00b7 Brassmere', signal:52, remark:'When both eyes stop, stop with them. Something is crossing.', notes:'Keeps perfect time with a world that isn\u2019t ours. Its eyes sweep like second hands \u2014 when both stop at once, another anomaly is near.'},
+  hound:{drive:'Ember core', temper:'Relentless', origin:'World R-9 \u00b7 Cindervale', signal:57, remark:'It does not chase. It arrives. There is a difference, and it matters.', notes:'Embers glow in its joints when it catches a scent from across the veil. It tracks signals the way a dog tracks game.'},
+  heron:{drive:'Hydraulic piston', temper:'Patient', origin:'World M-4 \u00b7 Stillmarsh', signal:49, remark:'Seven days I watched it not move. On the eighth, it was somewhere else.', notes:'Stands motionless in marsh water for days, waiting. What it waits for, no Archivist has recorded.'},
+  stag:{drive:'Tesla coil', temper:'Proud', origin:'World S-2 \u00b7 Stormreach', signal:63, remark:'Approach after the storm, never during. It is still deciding what the lightning meant.', notes:'Its antlers arc with stored lightning after storms. It appears where the air still hums.'},
+  manta:{drive:'Sonar foil', temper:'Gentle', origin:'World M-4 \u00b7 Stillmarsh', signal:61, remark:'It maps our world the way we map its. I choose to find that comforting.', notes:'It reads the fields by echo, the way its kin read the sea. Every pass redraws its map of our world.'},
+  bear:{drive:'Riveted furnace', temper:'Immovable', origin:'World G-6 \u00b7 Oldroot', signal:66, remark:'The old files say GUARD. Nobody wrote down what it guards. I no longer ask.', notes:'Slow, deliberate, and very hard to move once it settles. Older files claim it guards the oldest crossings.'},
+  spider:{drive:'Cryo lattice', temper:'Aloof', origin:'World F-8 \u00b7 Pale Expanse', signal:71, remark:'Frost in July. That is the whole report. That is enough.', notes:'Frost spreads from wherever it stands, even in summer. It weaves its web across the thinnest places.'},
+  dragon:{drive:'Grand gearwork', temper:'Ancient', origin:'World A-0 \u00b7 First Forge', signal:84, remark:'Every gear in it turns a gear in something else, somewhere else. Even this one, I think.', notes:'Every gear in it turns another gear in some other machine, somewhere else. The oldest design in the archive.'},
+  koi:{drive:'Photonic scale', temper:'Elusive', origin:'World L-5 \u00b7 Sunmere', signal:92, remark:'Brief, bright, and almost never believed. Log it anyway. Especially then.', notes:'It swims through light the way its kin swim through water. Sightings are brief, bright, and almost never believed.'}
 };
 function firstLogged(key){
   for(var L=1;L<=MAX_LEVEL;L++){
@@ -730,10 +740,11 @@ function firstLogged(key){
 }
 function openSheet(t){
   var coll=getCollection(), n0=coll[t.key]||0, found=n0>0;
-  var det=DETAILS[t.key]||{drive:'\u2014',notes:''};
+  var det=DETAILS[t.key]||{drive:'\u2014',temper:'\u2014',origin:'\u2014',signal:0,remark:'',notes:''};
   var fl=found?firstLogged(t.key):0;
+  var fno='00'+(TYPES.indexOf(t)+1); fno='FILE '+fno.slice(-3);
   var h='<div class="x" id="sheetX">\u2715</div>'+
-    '<div class="k">Archivist Log \u00b7 Specimen File</div>'+
+    '<div class="k">Archivist Log \u00b7 Specimen '+fno+'</div>'+
     '<h2>'+(found?t.name:'Unknown')+'</h2>'+
     '<div class="sub">'+(found?('Tier '+t.tier+' \u00b7 '+t.tierName):'Tier ??? \u00b7 Unclassified')+'</div>'+
     '<div class="sheet-hero"><img src="'+t.icon+'" alt=""'+(found?'':' class="sil"')+'></div>';
@@ -742,11 +753,21 @@ function openSheet(t){
       '<div class="row"><span class="rk">Finds</span><span class="rv teal">\u00d7 '+n0+' collected</span></div>'+
       '<div class="row"><span class="rk">First logged</span><span class="rv">'+(fl?('Level '+fl):'\u2014')+'</span></div>'+
       '<div class="row"><span class="rk">Drive</span><span class="rv">'+det.drive+'</span></div>'+
+      '<div class="row"><span class="rk">Temperament</span><span class="rv">'+det.temper+'</span></div>'+
+      '<div class="row"><span class="rk">Origin</span><span class="rv">'+det.origin+'</span></div>'+
       '<div class="row"><span class="rk">Status</span><span class="rv">Cataloged</span></div></div>'+
-      '<div class="sheet-cap">Field Evidence</div>'+
-      '<img class="sheet-photo" src="photos/'+t.key+'.webp" alt="Field photograph of '+t.name+'">'+
       '<div class="sheet-cap">Field Notes</div>'+
-      '<div class="sheet-notes">'+det.notes+'</div>';
+      '<div class="sheet-notes">'+det.notes+'</div>'+
+      '<div class="sheet-cap">Field Evidence \u00b7 Caught in the Wild</div>'+
+      '<img class="sheet-photo" src="photos/'+t.key+'.webp" alt="Field photograph of '+t.name+'">'+
+      '<div class="sheet-cap">Field Evidence \u00b7 Intake</div>'+
+      '<img class="sheet-photo" src="photos/'+t.key+'-intake.webp" alt="Intake photograph of '+t.name+'">'+
+      '<div class="dossier"><div class="dk">Field Dossier</div>'+
+      '<div class="dchips"><span class="dchip">DRIVE <b>'+det.drive.toUpperCase()+'</b></span>'+
+      '<span class="dchip">TEMPER <b>'+det.temper.toUpperCase()+'</b></span>'+
+      '<span class="dchip">ORIGIN <b>'+det.origin.split('\u00b7')[0].replace('World ','')+'</b></span></div>'+
+      '<div class="dsig">Signal Strength \u00b7 '+det.signal+'%</div><div class="dbar"><i style="width:'+det.signal+'%"></i></div>'+
+      '<div class="dremark">\u201c'+det.remark+'\u201d</div><div class="dwho">\u2014 The Archivist</div></div>';
   } else {
     h+='<div class="sheet-notes">No data. This machine has crossed into the scan fields, but no Archivist has logged it yet. Keep scanning.</div>';
   }
