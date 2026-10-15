@@ -245,7 +245,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 82</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 83</div>
 </div>
 <div class="overlay" id="winOverlay">
   <div class="win-card">
@@ -900,6 +900,11 @@ if(location.search.indexOf('fresh')!==-1){
   Object.keys(localStorage).forEach(function(k){ if(k.indexOf('arch_')===0) localStorage.removeItem(k); });
   location.href=location.pathname+'?v=67';
 } else {
+var _atm=location.search.match(/[?&]at=(\d+)/);
+if(_atm){
+  var _L=Math.max(1,Math.min(MAX_LEVEL,parseInt(_atm[1],10)));
+  lsSet('arch_level',_L); lsSet('arch_intro_seen',true); lsSet('arch_tutorial_done',true);
+}
 /* iOS PWA: keep audio unlocked on every tap */
 (function(){
   function _unlock(){
