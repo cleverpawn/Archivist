@@ -275,7 +275,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 88</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 89</div>
 </div>
 <div class="overlay" id="sheetOverlay">
   <div class="sheet-card" id="sheetCard"></div>
@@ -994,9 +994,12 @@ window.__scan={
   onBoardDown:onBoardDown, onBoardMove:onBoardMove, onBoardUp:onBoardUp,
   solution:function(){ return P().solution.slice(); }
 };
-if(location.search.indexOf('fresh')!==-1){
+if(location.search.indexOf('reset=collection')!==-1){
+  localStorage.removeItem('arch_collection');
+  location.href=location.pathname+'?v=89';
+} else if(location.search.indexOf('fresh')!==-1){
   Object.keys(localStorage).forEach(function(k){ if(k.indexOf('arch_')===0) localStorage.removeItem(k); });
-  location.href=location.pathname+'?v=67';
+  location.href=location.pathname+'?v=89';
 } else {
 (function(){
   var cur=lsGet('arch_level',1), max=0;
