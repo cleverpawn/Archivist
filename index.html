@@ -275,7 +275,7 @@
       <div class="cat-row" id="collRow"></div>
     </div>
   </div>
-  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 87</div>
+  <div class="foot">Prototype &middot; 6&times;6&ndash;12&times;12 scan fields &middot; build 88</div>
 </div>
 <div class="overlay" id="sheetOverlay">
   <div class="sheet-card" id="sheetCard"></div>
@@ -898,7 +898,8 @@ function endTutorial(){
   if(tutAudio) tutAudio.pause();
   lsSet('arch_tutorial_done', true);
   document.getElementById('tutNext').textContent='Got it';
-  render();
+  if(tutReturnLevel>1){ var back=tutReturnLevel; tutReturnLevel=0; loadLevel(back); }
+  else render();
 }
 document.getElementById('tutSkip').onclick=function(){ endTutorial(); };
 var SCAN_COOLDOWN=3*60*1000, askTimer=null;
@@ -959,10 +960,10 @@ document.getElementById('collBtn').onclick=function(){ showView('collection'); }
 document.getElementById('undoBtn').onclick=function(){ doUndo(); };
 document.getElementById('muteBtn').onclick=function(){ setMuted(!muted); };
 document.getElementById('muteBtn2').onclick=function(){ setMuted(!muted); };
+var tutReturnLevel=0;
 document.getElementById('tutBtn').onclick=function(){
+  tutReturnLevel=lsGet('arch_level', 1);
   lsSet('arch_tutorial_done', false);
-  // Reset to level 1 for tutorial
-  lsSet('arch_level', 1);
   loadLevel(1); showView('game');
 };
 document.getElementById('homeBtn1').onclick=function(){ showView('home'); };
@@ -997,6 +998,13 @@ if(location.search.indexOf('fresh')!==-1){
   Object.keys(localStorage).forEach(function(k){ if(k.indexOf('arch_')===0) localStorage.removeItem(k); });
   location.href=location.pathname+'?v=67';
 } else {
+(function(){
+  var cur=lsGet('arch_level',1), max=0;
+  Object.keys(state.done).forEach(function(k){
+    var m=k.match(/^L(\d+)$/); if(m) max=Math.max(max, parseInt(m[1],10));
+  });
+  if(max>=cur) lsSet('arch_level', Math.min(MAX_LEVEL, max+1));
+})();
 var _atm=location.search.match(/[?&]at=(\d+)/);
 if(_atm){
   var _L=Math.max(1,Math.min(MAX_LEVEL,parseInt(_atm[1],10)));
